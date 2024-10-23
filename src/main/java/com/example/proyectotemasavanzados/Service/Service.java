@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -19,12 +20,10 @@ public class Service {
     }
     @PostMapping("/ola")
     public ResponseEntity<HashMap<String, Object>> ola(@RequestBody Map<String, Object> body) {
-        String nombre=(String) body.get("nombre");
-        System.out.println("Ola " + nombre);
+        String temperatura=(String) body.get("Temperatura");
+        String humedad=(String) body.get("Humedad");
         String idDevice =  "12";
-        String timeStamp =  "12";
-        String temperatura = "12";
-        String humedad = "12";
+        String timeStamp = LocalDateTime.now().toString();
         Dato dato = new Dato();
         dato.setId(Integer.parseInt(idDevice));
         dato.setTimestamp(Instant.parse(timeStamp));
