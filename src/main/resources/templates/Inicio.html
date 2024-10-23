@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tabla Estética con Bootstrap</title>
+  <!-- Enlace a Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Datos recolectados</h2>
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover table-striped">
+      <thead class="table-dark">
+      <tr>
+        <th>#</th>
+        <th>Nombre Dispostivo</th>
+        <th>TimeStamp</th>
+        <th>Temperatura</th>
+        <th>Humedad</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="data : ${listaDatos}">
+        <th scope="row"  th:text="${data.id}"></th>
+        <td th:text="${data.id_dispositivo}" ></td>
+        <td th:text="${data.timestamp}" ></td>
+        <td th:text="${data.temperatura}" ></td>
+        <td th:text="${data.humedad}" ></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Enlace a Bootstrap 5 JS (opcional para funcionalidad) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
