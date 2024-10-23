@@ -11,7 +11,7 @@
 <div class="container mt-5">
   <h2 class="text-center mb-4">Datos recolectados</h2>
   <div class="table-responsive">
-    <table class="table table-bordered table-hover table-striped">
+    <table class="table table-bordered table-hover table-striped" id="tableSupreme">
       <thead class="table-dark">
       <tr>
         <th>#</th>
@@ -33,6 +33,71 @@
     </table>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded',  ()=>{
+    setInterval(miFuncion, 20000);
+  });
+  let ultimoElementoSupreme;
+  function miFuncion(){
+    $.ajax({
+      url: '/getDatos',
+      type: 'GET',
+      success: function (response) {
+        let listaMedicamentos = response;
+        console.log('Lista de medicamentos:', listaMedicamentos);
+        let ultimoElemento = listaMedicamentos[listaMedicamentos.length - 1]
+        if (ultimoElemento.id === ultimoElementoSupreme.id){
+          //NO SE HACE NADA
+        }else{
+          //Se agrega
+
+        }
+        listaMedicamentos.forEach(function(medicamento) {
+          total = total + (medicamento.idMedicine.price)* (medicamento.cantidad);
+          let imagen = document.getElementById(medicamento.idMedicine.idMedicine);
+          let divPadre = imagen.closest('.productset');
+          let boton = document.getElementById(medicamento.idMedicine.idMedicine);
+          if (divPadre) {
+            divPadre.classList.add('active');
+            boton.textContent = 'Sacar carrito';
+          } else {
+            console.error('No se encontró el div padre');
+          }
+        });
+        let miDiv = document.getElementById('total');
+        miDiv.textContent = 'S/.' + total.toFixed(2);
+
+      },
+      error: function (error) {
+        console.error('Auxilio', error);
+      }
+    });
+  }
+
+
+  function agregarFila(elemento) {
+    // Obtén la referencia de la tabla
+    var tabla = document.getElementById("tableSupreme").getElementsByTagName('tbody')[0];
+
+    // Inserta una nueva fila al final de la tabla
+    var nuevaFila = tabla.insertRow();
+
+    // Inserta nuevas celdas en la fila
+    var celdaId = nuevaFila.insertCell(0);
+    var celdaDispositivo = nuevaFila.insertCell(1);
+    var celdaTimestamp = nuevaFila.insertCell(2);
+    var celdaTemperatura = nuevaFila.insertCell(3);
+    var celdaHumedad = nuevaFila.insertCell(4);
+
+    // Agrega datos a las celdas
+    celdaId.innerHTML = elemento.id; // Cambia por el número de fila correspondiente
+    celdaDispositivo.innerHTML = "Dispositivo XYZ";
+    celdaTimestamp.innerHTML = "2024-10-23 10:30:00";
+    celdaTemperatura.innerHTML = "25°C";
+    celdaHumedad.innerHTML = "60%";
+  }
+</script>
 
 <!-- Enlace a Bootstrap 5 JS (opcional para funcionalidad) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
