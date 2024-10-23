@@ -21,12 +21,12 @@ public class Service {
     @PostMapping("/ola")
     public ResponseEntity<HashMap<String, Object>> ola(@RequestBody Map<String, Object> body) {
         String temperatura=(String) body.get("Temperatura");
+        temperatura=temperatura.split("°")[0];
         String humedad=(String) body.get("Humedad");
         String idDevice =  "12";
-        String timeStamp = LocalDateTime.now().toString();
         Dato dato = new Dato();
-        dato.setId(Integer.parseInt(idDevice));
-        dato.setTimestamp(Instant.parse(timeStamp));
+        dato.setIdDispositivo(idDevice);
+        dato.setTimestamp(Instant.now());
         dato.setTemperatura(new BigDecimal(temperatura));
         dato.setHumedad(new BigDecimal(humedad));
         datoRepository.save(dato);
