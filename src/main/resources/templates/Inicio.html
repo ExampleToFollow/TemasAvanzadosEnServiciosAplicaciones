@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +7,7 @@
 
   <!-- Enlace a Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-
+  <link href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css" rel="stylesheet">
   <style>
     body {
       margin: 0;
@@ -71,7 +71,7 @@
       padding: 30px;
       border-radius: 20px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      width: 80%;
+      width: 90%;
       max-width: 600px;
       background-image: url('https://img.freepik.com/vector-premium/fondo-cielo-nocturno-muchas-estrellas_135176-451.jpg?w=900');
       background-size: cover;
@@ -108,6 +108,46 @@
       margin-bottom: 20px;
       text-align: start;
     }
+    .time-range-selector {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      margin-bottom: 20px;
+    }
+
+    .time-range-selector label {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .time-range-selector input[type="datetime-local"] {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      outline: none;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    .time-range-selector input[type="datetime-local"]:focus {
+      border-color: #008ffb;
+    }
+
+    .apply-button {
+      padding: 8px 12px;
+      background-color: #008ffb;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .apply-button:hover {
+      background-color: #005bb5;
+    }
   </style>
 </head>
 <body>
@@ -123,16 +163,44 @@
   </nav>
 
   <div class="main">
-    <h2>TEMPERATURA Y HUMEDAD</h2>
-
-    <div class="card">
-      <h3> 🌤️ 13°C</h3>
+    <h2><span>TEMPERATURA Y HUMEDAD</span></h2>
+    <div class="card" style="padding-bottom: 5px!important;display: flex;position: relative">
+      <img id="noConexion" src="/iconNoWifi.png" alt="" style="width: 20%;position: absolute;z-index: 1000;top: 0;right: 0;display: none">
+      <h3 id="temperatura" style="font-weight: bold"></h3>
       <div class="info">
-        <p class="humidity-icon">89%</p>
+        <p id="humedad" class="humidity-icon" style="font-weight: bold"></p>
+      </div>
+      <div style="width: 100%;justify-content: right;display: flex">
+        <p id="hora"></p>
       </div>
     </div>
   </div>
+  <div class="statistics">
+    <h2>Gráficos</h2>
+    <div class="time-range-selector">
+      <span style="font-weight: bolder;font-size: 150%">Temperatura VS Tiempo</span>
+      <label for="tiempoInicioGraficoTemperaturaAreas">Inicio:</label>
+      <input type="datetime-local" id="tiempoInicioGraficoTemperaturaAreas">
 
+      <label for="tiempoFinalGraficoTemperaturaAreas">Fin:</label>
+      <input type="datetime-local" id="tiempoFinalGraficoTemperaturaAreas">
+
+      <button class="apply-button" onclick="recargarGraficoTemperaturaArea()">Aplicar</button>
+    </div>
+    <div id="graficoTemperaturaArea"></div>
+    <br>
+    <div class="time-range-selector">
+      <span style="font-weight: bolder;font-size: 150%">Humedad VS Tiempo</span>
+      <label for="tiempoInicioGraficoHumedadAreas">Inicio:</label>
+      <input type="datetime-local" id="tiempoInicioGraficoHumedadAreas">
+
+      <label for="tiempoFinalGraficoHumedadAreas">Fin:</label>
+      <input type="datetime-local" id="tiempoFinalGraficoHumedadAreas">
+
+      <button class="apply-button" onclick="recargarGraficoHumedadArea()">Aplicar</button>
+    </div>
+    <div id="graficoHumedadArea"></div>
+  </div>
   <div class="statistics">
     <h2>Estadísticas</h2>
 
@@ -148,23 +216,407 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="data : ${listaDatos}">
-          <th scope="row" th:text="${data.id}"></th>
-          <td th:text="${data.idDispositivo}"></td>
-          <td th:text="${data.timestamp}"></td>
-          <td th:text="${data.temperatura}"></td>
-          <td th:text="${data.humedad}"></td>
-        </tr>
         </tbody>
       </table>
     </div>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js"></script>
 
   <script>
-    document.addEventListener('DOMContentLoaded',  ()=>{
-      setInterval(miFuncion, 20000);
+    let datos;
+    let mTemperaturaArea;
+    let bTemperaturaArea;
+    let mHumedadArea;
+    let bHumedadArea;
+    let chartTemperaturaArea;
+    let chartHumedadArea;
+    let tiempoInicialChartTemperaturaArea;
+    let tiempoFinalChartTemperaturaArea;
+    let tiempoInicialChartHumedadArea;
+    let tiempoFinalChartHumedadArea;
+    const DateTime = luxon.DateTime;
+    let timeout;
+    const limiteSinRecibirDatos=20;
+
+    function ejecutarAccionInactividad() {
+      Swal.fire({
+        title: 'No se ha recibido ningún dato hace '+limiteSinRecibirDatos+' segundos',
+        text: 'Es posible que el dispositivo haya perdido conexión a Internet, o no se encuentre en funcionamiento',
+        icon: 'error',
+        confirmButtonText: 'Entendido',
+      });
+      $("#noConexion").show();
+    }
+
+    function reiniciarContadorSinConexion() {
+      $("#noConexion").hide();
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+
+      timeout = setTimeout(ejecutarAccionInactividad, limiteSinRecibirDatos*1000);
+    }
+
+    reiniciarContadorSinConexion();
+
+    function calcularRegresionLineal(expresion) {
+      const datosFiltrados=obtenerDatosFiltrados(expresion);
+      const n = datos.length;
+      let sumaX = 0, sumaY = 0, sumaXY = 0, sumaX2 = 0;
+
+      if(expresion=="Temperatura"){
+        datosFiltrados.forEach((punto) => {
+          const x = new Date(punto.timestamp).getTime();
+          const y = punto.temperatura;
+          sumaX += x;
+          sumaY += y;
+          sumaXY += x * y;
+          sumaX2 += x * x;
+        });
+        mTemperaturaArea = (n * sumaXY - sumaX * sumaY) / (n * sumaX2 - sumaX * sumaX);
+        bTemperaturaArea = (sumaY - mTemperaturaArea * sumaX) / n;
+      }else if(expresion=="Humedad"){
+        datosFiltrados.forEach((punto) => {
+          const x = new Date(punto.timestamp).getTime();
+          const y = punto.humedad;
+          sumaX += x;
+          sumaY += y;
+          sumaXY += x * y;
+          sumaX2 += x * x;
+        });
+        mHumedadArea= (n * sumaXY - sumaX * sumaY) / (n * sumaX2 - sumaX * sumaX);
+        bHumedadArea = (sumaY - mHumedadArea * sumaX) / n;
+      }
+    }
+
+    function generarPuntosRegresion(m,b,datosLocales) {
+      if(datosLocales.length!=0){
+        const xInicio = new Date(datosLocales[0].timestamp).getTime();
+        const xFin = new Date(datosLocales[datosLocales.length - 1].timestamp).getTime();
+        const yInicio = m * xInicio + b;
+        const yFin = m * xFin + b;
+        return [
+          { x: obtenerHoraTimestamp(datosLocales[0].timestamp), y: yInicio },
+          { x: obtenerHoraTimestamp(datosLocales[datosLocales.length - 1].timestamp), y: yFin }
+        ];
+      }else {
+        return {x:0,y:0}
+      }
+    }
+
+
+    function obtenerDatosFiltrados(expresion){
+      if(expresion=="Temperatura"){
+        tiempoInicialChartTemperaturaArea=$("#tiempoInicioGraficoTemperaturaAreas").val();
+        tiempoFinalChartTemperaturaArea=$("#tiempoFinalGraficoTemperaturaAreas").val();
+        if(tiempoInicialChartTemperaturaArea&&tiempoFinalChartTemperaturaArea){
+          return datos.filter(dato => {
+            const timestamp = new Date(dato.timestamp).getTime();
+            return timestamp >= new Date(tiempoInicialChartTemperaturaArea).getTime() && timestamp <= new Date(tiempoFinalChartTemperaturaArea).getTime();
+          });
+        }else {
+          return datos;
+        }
+      }else if(expresion=="Humedad"){
+        tiempoInicialChartHumedadArea=$("#tiempoInicioGraficoHumedadAreas").val();
+        tiempoFinalChartHumedadArea=$("#tiempoFinalGraficoHumedadAreas").val();
+        if(tiempoInicialChartHumedadArea&&tiempoFinalChartHumedadArea){
+          return datos.filter(dato => {
+            const timestamp = new Date(dato.timestamp).getTime();
+            return timestamp >= new Date(tiempoInicialChartHumedadArea).getTime() && timestamp <= new Date(tiempoFinalChartHumedadArea).getTime();
+          });
+        }else {
+          return datos;
+        }
+      }
+    }
+
+    function recargarGraficoTemperaturaArea(){
+      if(chartTemperaturaArea==null){
+        cargarGraficoTemperaturaArea();
+      }else {
+        const datosLocales=obtenerDatosFiltrados("Temperatura");
+        calcularRegresionLineal("Temperatura");
+        chartTemperaturaArea.updateSeries([{
+          name: 'Temperatura (C°)',
+          data: datosLocales.map(function (dato){
+            return {x:obtenerHoraTimestamp(dato.timestamp),y:dato.temperatura}
+          })
+        },
+          {
+            name: `Tendencia ${mTemperaturaArea < 0 ? "(disminuir" : "(aumentar"} ${Math.abs(mTemperaturaArea * 3600000).toFixed(2)} C° cada hora)`,
+            data: generarPuntosRegresion(mTemperaturaArea,bTemperaturaArea,datosLocales),
+            type: 'line'
+          }]);
+      }
+    }
+
+    function recargarGraficoHumedadArea(){
+      if(chartHumedadArea==null){
+        cargarGraficoHumedadArea();
+      }else {
+        const datosLocales=obtenerDatosFiltrados("Humedad");
+        calcularRegresionLineal("Humedad");
+        chartHumedadArea.updateSeries([{
+          name: 'Humedad (%)',
+          data: datosLocales.map(function (dato){
+            return {x:obtenerHoraTimestamp(dato.timestamp),y:dato.humedad}
+          })
+        },
+          {
+            name: `Tendencia ${mHumedadArea < 0 ? "(disminuir " : "(aumentar "} ${Math.abs(mHumedadArea * 3600000).toFixed(2)}% cada hora)`,
+            data: generarPuntosRegresion(mHumedadArea,bHumedadArea,datosLocales),
+            type: 'line'
+          }]);
+      }
+    }
+
+    function cargarGraficoTemperaturaArea(){
+      calcularRegresionLineal("Temperatura");
+      const puntosRegresion = generarPuntosRegresion(mTemperaturaArea, bTemperaturaArea,datos);
+      let tendencia;
+      if(mTemperaturaArea<0){
+        tendencia="Tendencia (disminuir "+(mTemperaturaArea*-3600000).toFixed(2)+" C° cada hora)";
+      }else {
+        tendencia="Tendencia (aumentar "+(mTemperaturaArea*3600000).toFixed(2)+" C° cada hora)";
+      }
+
+      const options = {
+        chart: {
+          type: 'area',
+          height: 350,
+          toolbar: {
+            show: true
+          }
+        },
+        series: [
+          {
+            name: 'Temperatura (C°)',
+            data: datos.map(function (dato){
+              return {x:obtenerHoraTimestamp(dato.timestamp),y:dato.temperatura}
+          }),
+            fill: {
+              type: 'gradient',
+              gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.7,
+                opacityTo: 0.3
+              }
+            }
+          },
+          {
+            name: tendencia,
+            data: puntosRegresion,
+            type: 'line',
+            stroke: {
+              curve: 'straight'
+            },
+            gradient: {
+              shadeIntensity: 2,
+              colorStops: [
+                {
+                  offset: 0,
+                  color: '#00b894',
+                },
+                {
+                  offset: 100,
+                  color: '#00b894',
+                }
+              ]
+            }
+          }],
+        xaxis: {
+          type: 'datetime',
+          title: {
+            text: 'Tiempo'
+          },
+          labels: {
+            format: 'HH:mm'
+          }
+        },
+        yaxis: {
+          title: {
+            text: 'Temperatura (°C)'
+          },
+          decimalsInFloat: 1
+        },
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          width: [3, 5]
+        },
+        tooltip: {
+          x: {
+            format: 'dd MMM HH:mm'
+          }
+        }
+      };
+
+      chartTemperaturaArea = new ApexCharts(document.querySelector("#graficoTemperaturaArea"), options);
+      chartTemperaturaArea.render();
+    }
+
+    function cargarGraficoHumedadArea(){
+      calcularRegresionLineal("Humedad");
+      console.log(datos)
+      const puntosRegresion = generarPuntosRegresion(mHumedadArea, bHumedadArea,datos);
+      let tendencia;
+      if(mHumedadArea<0){
+        tendencia="Tendencia (disminuir "+(mHumedadArea*-3600000).toFixed(2)+"% cada hora)";
+      }else {
+        tendencia="Tendencia (dumentar "+(mHumedadArea*3600000).toFixed(2)+"% cada hora)";
+      }
+
+      const options = {
+        chart: {
+          type: 'area',
+          height: 350,
+          toolbar: {
+            show: true
+          }
+        },
+        colors: ['#FFA500', '#8B4513'],
+        series: [
+          {
+            name: 'Humedad (%)',
+            data: datos.map(function (dato){
+              console.log(dato.timestamp)
+              console.log(new Date(dato.timestamp.replace(' ', 'T')).getTime())
+              return {x:obtenerHoraTimestamp(dato.timestamp),y:dato.humedad}
+            }),
+            fill: {
+              type: 'gradient',
+              gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.7,
+                opacityTo: 0.3
+              }
+            }
+          },
+          {
+            name: tendencia,
+            data: puntosRegresion,
+            type: 'line',
+            stroke: {
+              curve: 'straight'
+            },
+            gradient: {
+              shadeIntensity: 2,
+              colorStops: [
+                {
+                  offset: 0,
+                  color: '#00b894',
+                },
+                {
+                  offset: 100,
+                  color: '#00b894',
+                }
+              ]
+            }
+          }],
+        xaxis: {
+          type: 'datetime',
+          title: {
+            text: 'Tiempo'
+          },
+          labels: {
+            format: 'HH:mm'
+          }
+        },
+        yaxis: {
+          title: {
+            text: 'Humedad (%)'
+          },
+          decimalsInFloat: 1
+        },
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          width: [3, 5]
+        },
+        tooltip: {
+          x: {
+            format: 'dd MMM HH:mm'
+          }
+        }
+      };
+
+      chartHumedadArea = new ApexCharts(document.querySelector("#graficoHumedadArea"), options);
+      chartHumedadArea.render();
+    }
+    function obtenerHoraTimestamp(horaDateTime){
+      return DateTime.fromFormat(horaDateTime, 'yyyy-MM-dd HH:mm:ss', { zone: 'UTC' }).toMillis();
+    }
+  </script>
+  <script>
+    tabla=$("#tableSupreme").DataTable({
+      'paging': true,
+      "pageLength": 10,
+      "language": {
+        "lengthMenu": "Mostrar _MENU_ entradas por página",
+        "zeroRecords": "No se encontraron registros",
+        "infoEmpty": "No hay registros disponibles",
+        "infoFiltered": "(filtrado de _MAX_ total registros)",
+        "search": "Buscar:",
+        "info": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+        emptyTable: "Aún no existe algún dato registrado",
+        "paginate": {
+          "previous": "<",
+          "next": ">",
+        }
+      },
+      'lengthChange': true,
+      'lengthMenu': [  [10, 25, 50, 100, -1]  ,  [10, 25, 50, 100, "Todas"]  ],
+      "buttons": ['pageLength'],
+      'searching': true,
+      'ordering': true,
+      'info': true,
+      'autoWidth': false,
     });
+
+    let temperatura=null;
+    let humedad=null;
+    /*document.addEventListener('DOMContentLoaded',  ()=>{
+      setInterval(miFuncion, 20000);
+    });*/
     let ultimoElementoSupreme;
+    function obtenerDatos(){
+      return new Promise((resolve,reject)=>{
+        $.ajax({
+          url: '/obtenerDatos',
+          type: 'GET',
+          success: function (response) {
+            resolve(response.content);
+          },
+          error: function (xhr, status, error) {
+            reject(error);
+          }
+        });
+      })
+    }
+
+    async function cargarPagina(){
+      datos=await obtenerDatos();
+      for(let i=0;i<datos.length;i++){
+        agregarFila(datos[i]);
+      }
+      const ultimoDato=datos[datos.length-1];
+      recibirDato(ultimoDato);
+      cargarGraficoTemperaturaArea();
+      cargarGraficoHumedadArea();
+    }
+
+    cargarPagina();
+
     function miFuncion(){
       $.ajax({
         url: '/getDatos',
@@ -203,30 +655,73 @@
 
 
     function agregarFila(elemento) {
-      // Obtén la referencia de la tabla
-      var tabla = document.getElementById("tableSupreme").getElementsByTagName('tbody')[0];
-
-      // Inserta una nueva fila al final de la tabla
-      var nuevaFila = tabla.insertRow();
-
-      // Inserta nuevas celdas en la fila
-      var celdaId = nuevaFila.insertCell(0);
-      var celdaDispositivo = nuevaFila.insertCell(1);
-      var celdaTimestamp = nuevaFila.insertCell(2);
-      var celdaTemperatura = nuevaFila.insertCell(3);
-      var celdaHumedad = nuevaFila.insertCell(4);
-
-      // Agrega datos a las celdas
-      celdaId.innerHTML = elemento.id; // Cambia por el número de fila correspondiente
-      celdaDispositivo.innerHTML = "Dispositivo XYZ";
-      celdaTimestamp.innerHTML = "2024-10-23 10:30:00";
-      celdaTemperatura.innerHTML = "25°C";
-      celdaHumedad.innerHTML = "60%";
+      tabla.row.add([
+              elemento.id,
+              elemento.idDispositivo,
+              formatDate(elemento.timestamp),
+              elemento.temperatura+"°C",
+              elemento.humedad+"%"
+      ]).draw(false);
+      tabla.order([0, 'desc']).draw();
     }
   </script>
+  <script>
+    let stompClient = null;
+    function connect() {
+      let socket = new SockJS('/message');
+      stompClient = Stomp.over(socket);
+      stompClient.connect({}, function (frame) {
+        stompClient.subscribe('/topic/recibirDato', function (messageOutput) {
+          const nuevoDato=JSON.parse(messageOutput.body);
+          recibirDato(nuevoDato);
+          agregarFila(nuevoDato);
+          datos.push(nuevoDato);
+          recargarGraficoTemperaturaArea()
+          recargarGraficoHumedadArea()
+          reiniciarContadorSinConexion();
+        });
+      });
+    }
 
-  <!-- Enlace a Bootstrap 5 JS (opcional para funcionalidad) -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    function formatDate(datetime) {
+      const [datePart, timePart] = datetime.split(' ');
+      const [year, month, day] = datePart.split('-');
+      const [hours, minutes, seconds] = timePart.split(':');
+      return `${day}/${month}/${year.slice(-2)} - ${hours}:${minutes}:${seconds}`;
+    }
+
+    function recibirDato(dato){
+      const temperaturaRecibida=dato.temperatura;
+      const humedadRecibida=dato.humedad;
+      const elementoTemperatura=$("#temperatura");
+      const elementoHumedad=$("#humedad");
+      const elementoHora=$("#hora");
+      if(temperaturaRecibida>30){
+        elementoTemperatura.text("🔥 "+temperaturaRecibida+"°C");
+      }else if(temperaturaRecibida>24){
+        elementoTemperatura.text("☀️ "+temperaturaRecibida+"°C");
+      }else if(temperaturaRecibida>18){
+        elementoTemperatura.text("🌤️ "+temperaturaRecibida+"°C");
+      }else{
+        elementoTemperatura.text("🧊 "+temperaturaRecibida+"°C");
+      }
+
+      if(humedadRecibida>80){
+        elementoHumedad.text("🌧️ "+humedadRecibida+"%");
+      }else if(humedadRecibida>70){
+        elementoHumedad.text("🌫️ "+humedadRecibida+"%");
+      }else if(humedadRecibida>40){
+        elementoHumedad.text("💧 "+humedadRecibida+"%");
+      }else{
+        elementoHumedad.text("🌵 "+humedadRecibida+"%");
+      }
+
+      elementoHora.text("Muestra tomada el: "+formatDate(dato.timestamp));
+
+    }
+    connect();
+  </script>
+
 </body>
 </html>
 
