@@ -30,27 +30,30 @@ public class Service {
 
     @PostMapping("/registrarDato")
     public ResponseEntity<HashMap<String, Object>> registrarDato(@RequestBody Map<String, Object> body) {
-        String temperatura=(String) body.get("Temperatura");
-        temperatura=temperatura.split("°")[0];
-        String humedad=(String) body.get("Humedad");
-        String idDevice =  "12";
-        String timestamp=(String) body.get("Timestamp");
-        String salon=(String) body.get("Salon");
-        String password=(String) body.get("Password");
-        Integer idSalon=salonRepository.verificarIdSalon(salon,password);
-        if(idSalon!=null){
-            Dato dato = new Dato();
-            if(timestamp==null){
-                dato.setTimestamp(ZonedDateTime.now(ZoneId.of("America/Lima")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            }else {
-                dato.setTimestamp(timestamp);
+        List<HashMap<String,Object>> lista = (List<HashMap<String, Object>>) body.get("lista");
+        for(HashMap<String,Object> elemento: lista){
+            String temperatura=(String) elemento.get("Temperatura");
+            temperatura=temperatura.split("°")[0];
+            String humedad=(String) elemento.get("Humedad");
+            String idDevice =  "12";
+            String timestamp=(String) elemento.get("Timestamp");
+            String salon=(String) elemento.get("Salon");
+            String password=(String) elemento.get("Password");
+            Integer idSalon=salonRepository.verificarIdSalon(salon,password);
+            if(idSalon!=null){
+                Dato dato = new Dato();
+                if(timestamp==null){
+                    dato.setTimestamp(ZonedDateTime.now(ZoneId.of("America/Lima")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                }else {
+                    dato.setTimestamp(timestamp);
+                }
+                dato.setSalon(salonRepository.findById(idSalon).get());
+                dato.setIdDispositivo(idDevice);
+                dato.setTemperatura(new BigDecimal(temperatura));
+                dato.setHumedad(new BigDecimal(humedad));
+                datoRepository.save(dato);
+                simpMessagingTemplate.convertAndSend("/topic/recibirDato",dato);
             }
-            dato.setSalon(salonRepository.findById(idSalon).get());
-            dato.setIdDispositivo(idDevice);
-            dato.setTemperatura(new BigDecimal(temperatura));
-            dato.setHumedad(new BigDecimal(humedad));
-            datoRepository.save(dato);
-            simpMessagingTemplate.convertAndSend("/topic/recibirDato",dato);
         }
         return null;
     }
