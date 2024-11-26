@@ -156,8 +156,7 @@
   </header>
 
   <nav>
-    <a href="#" class="active">V304</a>
-    <a href="#">V305</a>
+    <a href="#" class="active">V305</a>
     <a href="#">V306</a>
     <a href="#">V307</a>
   </nav>
@@ -592,8 +591,8 @@
     function obtenerDatos(){
       return new Promise((resolve,reject)=>{
         $.ajax({
-          url: '/obtenerDatos',
-          type: 'GET',
+          url: `/datosPorSalon/V305`,
+          method: "GET",
           success: function (response) {
             resolve(response.content);
           },
@@ -617,40 +616,43 @@
 
     cargarPagina();
 
-    function miFuncion(){
+    function cargarDatosPorSalon(salon) {
       $.ajax({
-        url: '/getDatos',
-        type: 'GET',
-        success: function (response) {
-          let listaMedicamentos = response;
-          console.log('Lista de medicamentos:', listaMedicamentos);
-          let ultimoElemento = listaMedicamentos[listaMedicamentos.length - 1]
-          if (ultimoElemento.id === ultimoElementoSupreme.id){
-            //NO SE HACE NADA
-          }else{
-            //Se agrega
+        url: `/datosPorSalon/${salon}`,
+        method: "GET",
+        success: function(response) {
+          if (response.status === "success") {
+            const datos = response.content;
 
+            tabla.clear();
+
+            datos.forEach((dato, index) => {
+              tabla.row.add([
+                index + 1,
+                dato.idDispositivo || "N/A",
+                dato.timestamp,
+                dato.temperatura,
+                dato.humedad
+              ]);
+            });
+
+            tabla.draw();
+
+            actualizarGraficos(datos);
           }
-          listaMedicamentos.forEach(function(medicamento) {
-            total = total + (medicamento.idMedicine.price)* (medicamento.cantidad);
-            let imagen = document.getElementById(medicamento.idMedicine.idMedicine);
-            let divPadre = imagen.closest('.productset');
-            let boton = document.getElementById(medicamento.idMedicine.idMedicine);
-            if (divPadre) {
-              divPadre.classList.add('active');
-              boton.textContent = 'Sacar carrito';
-            } else {
-              console.error('No se encontró el div padre');
-            }
-          });
-          let miDiv = document.getElementById('total');
-          miDiv.textContent = 'S/.' + total.toFixed(2);
-
         },
-        error: function (error) {
-          console.error('Auxilio', error);
+        error: function() {
+          Swal.fire("Error", "No se pudieron cargar los datos del salón", "error");
         }
       });
+    }
+
+    function actualizarGraficos(datos) {
+      const temperaturas = datos.map(dato => ({ x: dato.timestamp, y: dato.temperatura }));
+      const humedades = datos.map(dato => ({ x: dato.timestamp, y: dato.humedad }));
+
+      chartTemperaturaArea.updateSeries([{ data: temperaturas }]);
+      chartHumedadArea.updateSeries([{ data: humedades }]);
     }
 
 
@@ -664,6 +666,22 @@
       ]).draw(false);
       tabla.order([0, 'desc']).draw();
     }
+
+    document.querySelectorAll("nav a").forEach(link => {
+      link.addEventListener("click", function(event) {
+        event.preventDefault();
+
+        document.querySelectorAll("nav a").forEach(nav => nav.classList.remove("active"));
+        this.classList.add("active");
+
+        const salon = this.textContent.trim();
+        cargarDatosPorSalon(salon);
+      });
+    });
+
+    const salonActivo = document.querySelector("nav a.active").textContent.trim();
+    cargarDatosPorSalon(salonActivo);
+
   </script>
   <script>
     let stompClient = null;
@@ -673,14 +691,22 @@
       stompClient.connect({}, function (frame) {
         stompClient.subscribe('/topic/recibirDato', function (messageOutput) {
           const nuevoDato=JSON.parse(messageOutput.body);
-          recibirDato(nuevoDato);
-          agregarFila(nuevoDato);
-          datos.push(nuevoDato);
-          recargarGraficoTemperaturaArea()
-          recargarGraficoHumedadArea()
-          reiniciarContadorSinConexion();
-        });
+          const salonActivo = obtenerSalonActivo();
+
+          if (nuevoDato.salon.nombre === salonActivo) {
+            recibirDato(nuevoDato);
+            agregarFila(nuevoDato);
+            datos.push(nuevoDato);
+            recargarGraficoTemperaturaArea()
+            recargarGraficoHumedadArea()
+            reiniciarContadorSinConexion();
+          }
+          });
       });
+    }
+
+    function obtenerSalonActivo() {
+      return document.querySelector("nav a.active").textContent.trim();
     }
 
     function formatDate(datetime) {
@@ -721,6 +747,7 @@
     }
     connect();
   </script>
+
 
 </body>
 </html>
