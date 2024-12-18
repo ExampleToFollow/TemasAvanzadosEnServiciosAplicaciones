@@ -490,6 +490,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    /*
     $(document).ready(function() {
         var table = $('#miTabla, #miTabla2, #miTabla3, #miTabla4, #miTabla5').DataTable({
             "pageLength": 5,
@@ -550,7 +551,7 @@
             $('#filtroEstado').val('');
             table.search('').columns().search('').draw();
         });
-    });
+    });*/
 
 
 </script>
@@ -1211,7 +1212,15 @@
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function (frame) {
             stompClient.subscribe('/topic/recibirDato', function (messageOutput) {
-                const nuevoDato=JSON.parse(messageOutput.body);
+                const nuevoDato=JSON.parse(messageOutput.body).dato;
+                const nuevoSalon=JSON.parse(messageOutput.body).salon;
+                if (nuevoSalon === "V305"){
+                    $("#temperatura-V305").text(nuevoDato.temperatura+" °C");
+                }else if (nuevoSalon === "V306"){
+                    $("#temperatura-V306").text(nuevoDato.temperatura+" °C");
+                }else{
+                    $("#temperatura-V307").text(nuevoDato.temperatura+" °C");
+                }
 
                 recibirDato(nuevoDato);
                 agregarFila(nuevoDato);
@@ -1237,6 +1246,8 @@
         const humedadRecibida=dato.humedad;
         const elementoHumedad=$("#humedad");
         const elementoHora=$("#hora");
+
+
 
         // elementoTemperatura = document.querySelector(`#temperatura-${salon}`);
         /*if (elementoTemperatura) {
