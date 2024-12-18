@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -156,10 +156,14 @@
   </header>
 
   <nav>
-    <a href="#" class="active">V305</a>
-    <a href="#">V306</a>
-    <a href="#">V307</a>
+    <a href="/Inicio/V305"
+       th:classappend="${nombreSalon == 'V305'} ? 'active' : ''">V305</a>
+    <a href="/Inicio/V306"
+       th:classappend="${nombreSalon == 'V306'} ? 'active' : ''">V306</a>
+    <a href="/Inicio/V307"
+       th:classappend="${nombreSalon == 'V307'} ? 'active' : ''">V307</a>
   </nav>
+
 
   <div class="main">
     <h2><span>TEMPERATURA Y HUMEDAD</span></h2>
@@ -228,7 +232,8 @@
   <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js"></script>
 
-  <script>
+  <script th:inline="javascript">
+    const salonActivo=[[${salonActivo}]];
     let datos;
     let mTemperaturaArea;
     let bTemperaturaArea;
@@ -465,7 +470,6 @@
 
     function cargarGraficoHumedadArea(){
       calcularRegresionLineal("Humedad");
-      console.log(datos)
       const puntosRegresion = generarPuntosRegresion(mHumedadArea, bHumedadArea,datos);
       let tendencia;
       if(mHumedadArea<0){
@@ -667,19 +671,7 @@
       tabla.order([0, 'desc']).draw();
     }
 
-    document.querySelectorAll("nav a").forEach(link => {
-      link.addEventListener("click", function(event) {
-        event.preventDefault();
 
-        document.querySelectorAll("nav a").forEach(nav => nav.classList.remove("active"));
-        this.classList.add("active");
-
-        const salon = this.textContent.trim();
-        cargarDatosPorSalon(salon);
-      });
-    });
-
-    const salonActivo = document.querySelector("nav a.active").textContent.trim();
     cargarDatosPorSalon(salonActivo);
 
   </script>
@@ -691,7 +683,6 @@
       stompClient.connect({}, function (frame) {
         stompClient.subscribe('/topic/recibirDato', function (messageOutput) {
           const nuevoDato=JSON.parse(messageOutput.body);
-          const salonActivo = obtenerSalonActivo();
 
           if (nuevoDato.salon.nombre === salonActivo) {
             recibirDato(nuevoDato);
@@ -705,9 +696,7 @@
       });
     }
 
-    function obtenerSalonActivo() {
-      return document.querySelector("nav a.active").textContent.trim();
-    }
+
 
     function formatDate(datetime) {
       const [datePart, timePart] = datetime.split(' ');
