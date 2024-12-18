@@ -600,153 +600,19 @@
 <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const ctx = document.getElementById('temperatureChart').getContext('2d');
 
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['20:00', '21:00', '22:00', '23:00', '04:00', '08:00', '12:00', '16:00'], // Etiquetas de tiempo
-                datasets: [
-                    {
-                        label: 'Channel 1',
-                        data: [19.5, 20.3, 19.8, 21.1, 20.5, 19.6, 20.2, 20.0], // Datos del canal 1
-                        borderColor: '#4285F4', // Azul
-                        backgroundColor: 'rgba(66, 133, 244, 0.2)',
-                        borderWidth: 2,
-                        fill: false,
-                        tension: 0.3
-                    },
-                    {
-                        label: 'Channel 2',
-                        data: [19.2, 20.1, 18.9, 19.7, 21.0, 19.8, 20.5, 19.6], // Datos del canal 2
-                        borderColor: '#34A853', // Verde
-                        backgroundColor: 'rgba(52, 168, 83, 0.2)',
-                        borderWidth: 2,
-                        fill: false,
-                        tension: 0.3
-                    },
-                    {
-                        label: 'Channel 3',
-                        data: [18.7, 20.0, 19.0, 20.6, 20.1, 21.0, 19.9, 18.7], // Datos del canal 3
-                        borderColor: '#EA4335', // Rojo
-                        backgroundColor: 'rgba(234, 67, 53, 0.2)',
-                        borderWidth: 2,
-                        fill: false,
-                        tension: 0.3
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'bottom'
-                    }
-                },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Time'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Temperature (°C)'
-                        },
-                        min: 18,
-                        max: 22
-                    }
-                }
-            }
-        });
-    });
 </script>
 
 <!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const ctx = document.getElementById('humidityChart').getContext('2d');
-
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['20:00', '21:00', '22:00', '23:00', '04:00', '08:00', '12:00', '16:00'], // Etiquetas de tiempo
-                datasets: [
-                    {
-                        label: 'Channel 1',
-                        data: [50, 47, 40, 35, 38, 42, 65, 55], // Datos de Channel 1
-                        borderColor: '#4285F4',
-                        backgroundColor: 'rgba(66, 133, 244, 0.3)',
-                        borderWidth: 2,
-                        pointRadius: 3,
-                        fill: true,
-                        tension: 0.3
-                    },
-                    {
-                        label: 'Channel 2',
-                        data: [48, 45, 38, 36, 39, 43, 60, 52], // Datos de Channel 2
-                        borderColor: '#34A853',
-                        backgroundColor: 'rgba(52, 168, 83, 0.3)',
-                        borderWidth: 2,
-                        pointRadius: 3,
-                        fill: true,
-                        tension: 0.3
-                    },
-                    {
-                        label: 'Channel 3',
-                        data: [47, 44, 37, 35, 37, 41, 67, 50], // Datos de Channel 3
-                        borderColor: '#EA4335',
-                        backgroundColor: 'rgba(234, 67, 53, 0.3)',
-                        borderWidth: 2,
-                        pointRadius: 3,
-                        fill: true,
-                        tension: 0.3
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'bottom'
-                    }
-                },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Time'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Humidity (%)'
-                        },
-                        min: 30,
-                        max: 70
-                    }
-                }
-            }
-        });
-    });
-
-
     const slider = document.getElementById('hygroSlider');
     const needle = document.getElementById('needle');
     const humidityValue = document.getElementById('humidityValue');
     const sliderLabel = document.getElementById('sliderLabel');
 
     // Valores de humedad por salón
-    const humidityData = {
+    let humidityData = {
         1: { name: "V305", humidity: 20 },
         2: { name: "V306", humidity: 50 },
         3: { name: "V307", humidity: 80 },
@@ -1207,6 +1073,226 @@
 </script>
 <script>
     let stompClient = null;
+    let humedad305;
+    let humedad306;
+    let humedad307;
+    let temperatureChart = null;
+    let humedadChart = null;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('humidityChart').getContext('2d');
+
+        humedadChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Etiquetas de tiempo
+                datasets: [
+                    {
+                        label: 'V305',
+                        data: [], // Datos de Channel 1
+                        borderColor: '#4285F4',
+                        backgroundColor: 'rgba(66, 133, 244, 0.3)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'V306',
+                        data: [], // Datos de Channel 2
+                        borderColor: '#34A853',
+                        backgroundColor: 'rgba(52, 168, 83, 0.3)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'V307',
+                        data: [], // Datos de Channel 3
+                        borderColor: '#EA4335',
+                        backgroundColor: 'rgba(234, 67, 53, 0.3)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        fill: true,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tiempo'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Humedad (%)'
+                        },
+                        min: 30,
+                        max: 70
+                    }
+                }
+            }
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('temperatureChart').getContext('2d');
+
+        temperatureChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Etiquetas de tiempo
+                datasets: [
+                    {
+                        label: 'V305',
+                        data: [], // Datos del canal 1
+                        borderColor: '#4285F4', // Azul
+                        backgroundColor: 'rgba(66, 133, 244, 0.2)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'V306',
+                        data: [], // Datos del canal 2
+                        borderColor: '#34A853', // Verde
+                        backgroundColor: 'rgba(52, 168, 83, 0.2)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'V307',
+                        data: [], // Datos del canal 3
+                        borderColor: '#EA4335', // Rojo
+                        backgroundColor: 'rgba(234, 67, 53, 0.2)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tiempo'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Temperatura (°C)'
+                        },
+                        min: 18,
+                        max: 22
+                    }
+                }
+            }
+        });
+    });
+
+    function actualizarGrafico(message) {
+        if (!temperatureChart || !temperatureChart.data || !temperatureChart.data.datasets) {
+            console.error("El gráfico no está inicializado.");
+            return;
+        }
+
+        const { dato, salon } = message;
+        if (!dato || !salon) {
+            console.error("Mensaje recibido no es válido:", message);
+            return;
+        }
+
+        const { timestamp, temperatura } = dato;
+        const dataset = temperatureChart.data.datasets.find(ds => ds.label === salon);
+
+        if (dataset) {
+            dataset.data.push(parseFloat(temperatura));
+
+            // Verifica que no existan etiquetas duplicadas
+            if (!temperatureChart.data.labels.includes(timestamp)) {
+                temperatureChart.data.labels.push(timestamp);
+            }
+
+            // Obtenemos todos los valores de temperatura de todos los datasets
+            const allData = temperatureChart.data.datasets.flatMap(ds => ds.data);
+
+            // Calculamos los nuevos límites dinámicos
+            const newMin = Math.min(...allData) - 1; // Agregamos un margen inferior
+            const newMax = Math.max(...allData) + 1; // Agregamos un margen superior
+
+            // Actualizamos las escalas del eje Y
+            temperatureChart.options.scales.y.min = newMin;
+            temperatureChart.options.scales.y.max = newMax;
+
+            temperatureChart.update();
+        } else {
+            console.warn(`No se encontró un dataset para el salón ${salon}`);
+        }
+    }
+    function actualizarGraficoHumedad(message) {
+        if (!humedadChart || !humedadChart.data || !humedadChart.data.datasets) {
+            console.error("El gráfico no está inicializado.");
+            return;
+        }
+
+        const { dato, salon } = message;
+        if (!dato || !salon) {
+            console.error("Mensaje recibido no es válido:", message);
+            return;
+        }
+
+        const { timestamp, humedad } = dato;
+        const dataset = humedadChart.data.datasets.find(ds => ds.label === salon);
+
+        if (dataset) {
+            dataset.data.push(parseFloat(humedad));
+
+            // Verifica que no existan etiquetas duplicadas
+            if (!humedadChart.data.labels.includes(timestamp)) {
+                humedadChart.data.labels.push(timestamp);
+            }
+
+            // Obtenemos todos los valores de temperatura de todos los datasets
+            const allData = humedadChart.data.datasets.flatMap(ds => ds.data);
+
+            // Calculamos los nuevos límites dinámicos
+            const newMin = Math.min(...allData) - 1; // Agregamos un margen inferior
+            const newMax = Math.max(...allData) + 1; // Agregamos un margen superior
+
+            // Actualizamos las escalas del eje Y
+            humedadChart.options.scales.y.min = newMin;
+            humedadChart.options.scales.y.max = newMax;
+
+            humedadChart.update();
+        } else {
+            console.warn(`No se encontró un dataset para el salón ${salon}`);
+        }
+    }
+
     function connect() {
         let socket = new SockJS('/message');
         stompClient = Stomp.over(socket);
@@ -1214,13 +1300,28 @@
             stompClient.subscribe('/topic/recibirDato', function (messageOutput) {
                 const nuevoDato=JSON.parse(messageOutput.body).dato;
                 const nuevoSalon=JSON.parse(messageOutput.body).salon;
+
                 if (nuevoSalon === "V305"){
                     $("#temperatura-V305").text(nuevoDato.temperatura+" °C");
+                    humedad305 = nuevoDato.humedad;
                 }else if (nuevoSalon === "V306"){
                     $("#temperatura-V306").text(nuevoDato.temperatura+" °C");
+                    humedad306 = nuevoDato.humedad;
                 }else{
                     $("#temperatura-V307").text(nuevoDato.temperatura+" °C");
+                    humedad307 = nuevoDato.humedad;
                 }
+
+                humidityData={
+                    1: { name: "V305", humidity: humedad305 },
+                    2: { name: "V306", humidity: humedad306 },
+                    3: { name: "V307", humidity: humedad307 },
+                };
+
+                slider.dispatchEvent(new Event('input'));
+
+                actualizarGrafico(JSON.parse(messageOutput.body));
+                actualizarGraficoHumedad(JSON.parse(messageOutput.body));
 
                 recibirDato(nuevoDato);
                 agregarFila(nuevoDato);
