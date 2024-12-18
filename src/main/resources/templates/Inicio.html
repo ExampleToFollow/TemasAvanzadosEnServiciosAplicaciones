@@ -512,21 +512,21 @@
             <div class="col-6" style="display: flex;justify-content: space-around">
               <span>Noche (1): </span>
               <input style="width: fit-content" class="form-control" type="time" disabled value="00:00">
-              <input onchange="aux()" style="width: fit-content" class="form-control" type="time" value="06:00" id="a_1-temperatura">
+              <input oninput="aux(this)" style="width: fit-content" class="form-control" type="time" value="06:00" id="a_1-temperatura">
             </div>
             <div class="col-6" style="display: flex;justify-content: space-around">
               <span>Mañana: </span>
-              <input style="width: fit-content" class="form-control" value="06:00" type="time" id="a_2-temperatura">
-              <input style="width: fit-content" class="form-control" value="12:00" type="time" id="b_1-temperatura">
+              <input oninput="aux(this)" style="width: fit-content" class="form-control" value="06:00" type="time" id="a_2-temperatura">
+              <input oninput="aux(this)" style="width: fit-content" class="form-control" value="12:00" type="time" id="b_1-temperatura">
             </div>
             <div class="col-6" style="display: flex;justify-content: space-around">
               <span>Tarde: </span>
-              <input style="width: fit-content" class="form-control" value="12:00" type="time" id="b_2-temperatura">
-              <input style="width: fit-content" class="form-control" value="18:00" type="time" id="c_1-temperatura">
+              <input oninput="aux(this)" style="width: fit-content" class="form-control" value="12:00" type="time" id="b_2-temperatura">
+              <input oninput="aux(this)" style="width: fit-content" class="form-control" value="18:00" type="time" id="c_1-temperatura">
             </div>
             <div class="col-6" style="display: flex;justify-content: space-around">
               <span>Noche (2): </span>
-              <input style="width: fit-content" class="form-control" value="18:00" type="time" id="c_2-temperatura">
+              <input oninput="aux(this)" style="width: fit-content" class="form-control" value="18:00" type="time" id="c_2-temperatura">
               <input style="width: fit-content" class="form-control" type="time" disabled value="23:59">
             </div>
           </div>
@@ -536,7 +536,7 @@
         <div class="col-lg-6">
           <div class="row">
             <div class="time-range-selector" style="display: flex;align-items: center">
-              <span style="font-weight: bolder;font-size: 150%">Promedios de temperatura por día</span>
+              <span style="font-weight: bolder;font-size: 150%">Promedios de humedad por día</span>
               <label for="tiempoInicioGraficoHumedadBarras">Inicio:</label>
               <input type="datetime-local" id="tiempoInicioGraficoHumedadBarras">
 
@@ -549,21 +549,21 @@
             <div class="col-6" style="display: flex;justify-content: space-around">
               <span>Noche (1): </span>
               <input style="width: fit-content" class="form-control" type="time" disabled value="00:00">
-              <input style="width: fit-content" class="form-control" type="time" value="06:00" id="a_1-humedad">
+              <input oninput="aux(this)" style="width: fit-content" class="form-control" type="time" value="06:00" id="a_1-humedad">
             </div>
             <div class="col-6" style="display: flex;justify-content: space-around">
               <span>Mañana: </span>
-              <input style="width: fit-content" class="form-control" value="06:00" type="time" id="a_2-humedad">
-              <input style="width: fit-content" class="form-control" value="12:00" type="time" id="b_1-humedad">
+              <input oninput="aux(this)" style="width: fit-content" class="form-control" value="06:00" type="time" id="a_2-humedad">
+              <input oninput="aux(this)" style="width: fit-content" class="form-control" value="12:00" type="time" id="b_1-humedad">
             </div>
             <div class="col-6" style="display: flex;justify-content: space-around">
               <span>Tarde: </span>
-              <input style="width: fit-content" class="form-control" value="12:00" type="time" id="b_2-humedad">
-              <input style="width: fit-content" class="form-control" value="18:00" type="time" id="c_1-humedad">
+              <input oninput="aux(this)" style="width: fit-content" class="form-control" value="12:00" type="time" id="b_2-humedad">
+              <input oninput="aux(this)" style="width: fit-content" class="form-control" value="18:00" type="time" id="c_1-humedad">
             </div>
             <div class="col-6" style="display: flex;justify-content: space-around">
               <span>Noche (2): </span>
-              <input style="width: fit-content" class="form-control" value="18:00" type="time" id="c_2-humedad">
+              <input oninput="aux(this)" style="width: fit-content" class="form-control" value="18:00" type="time" id="c_2-humedad">
               <input style="width: fit-content" class="form-control" type="time" disabled value="23:59">
             </div>
           </div>
@@ -774,7 +774,6 @@
       }else {
         const datosLocales=obtenerDatosFiltrados("Temperatura");
         calcularRegresionLineal("Temperatura");
-        console.log(mTemperaturaArea,bTemperaturaArea)
 
         chartTemperaturaArea.updateSeries([{
           name: 'Temperatura (C°)',
@@ -901,8 +900,46 @@
       chartTemperaturaArea.render();
     }
 
-    function aux(){
-      console.log(this)
+    function aux(ola){
+      const id=ola.id;
+      switch (id){
+        case "a_1-temperatura":
+          $("#a_2-temperatura").val(ola.value);
+          break;
+        case "a_2-temperatura":
+          $("#a_1-temperatura").val(ola.value);
+          break;
+        case "b_1-temperatura":
+          $("#b_2-temperatura").val(ola.value);
+          break;
+        case "b_2-temperatura":
+          $("#b_1-temperatura").val(ola.value);
+          break;
+        case "c_1-temperatura":
+          $("#c_2-temperatura").val(ola.value);
+          break;
+        case "c_2-temperatura":
+          $("#c_1-temperatura").val(ola.value);
+          break;
+        case "a_1-humedad":
+          $("#a_2-humedad").val(ola.value);
+          break;
+        case "a_2-humedad":
+          $("#a_1-humedad").val(ola.value);
+          break;
+        case "b_1-humedad":
+          $("#b_2-humedad").val(ola.value);
+          break;
+        case "b_2-humedad":
+          $("#b_1-humedad").val(ola.value);
+          break;
+        case "c_1-humedad":
+          $("#c_2-humedad").val(ola.value);
+          break;
+        case "c_2-humedad":
+          $("#c_1-humedad").val(ola.value);
+          break;
+      }
     }
 
     function validarRangoCorrectoTemperatura() {
@@ -936,7 +973,6 @@
     function cargarGraficoHumedadArea(){
       calcularRegresionLineal("Humedad");
       const puntosRegresion = generarPuntosRegresion(mHumedadArea, bHumedadArea,datos);
-      console.log(puntosRegresion)
       let tendencia;
       if(mHumedadArea<0){
         tendencia="Tendencia (disminuir "+(mHumedadArea*-3600000).toFixed(2)+"% cada hora)";
@@ -1086,7 +1122,7 @@
       cargarGraficoHumedadArea();
       recargarGraficoTemperaturaArea()
       recargarGraficoHumedadArea()
-      // Ejemplo de uso:
+
       recargarGraficoTemperaturaBarra();
       recargarGraficoHumedadBarra()
     }
@@ -1150,7 +1186,7 @@
               elemento.temperatura+"°C",
               elemento.humedad+"%"
       ]).draw(false);
-      tabla.order([0, 'desc']).draw();
+      tabla.order([2, 'desc']).draw();
     }
 
     let stompClient = null;
@@ -1184,7 +1220,6 @@
     }
 
     function recibirDato(dato){
-      console.log(dato)
       const temperaturaRecibida=dato.temperatura;
       const humedadRecibida=dato.humedad;
       const elementoTemperatura=$("#temperatura");
@@ -1271,38 +1306,50 @@
     }
 
     function recargarGraficoTemperaturaBarra() {
+      if(validarRangoCorrectoTemperatura()){
+        const a = convertirHoraADecimal($("#a_1-temperatura").val());
+        const b = convertirHoraADecimal($("#b_1-temperatura").val());
+        const c = convertirHoraADecimal($("#c_1-temperatura").val());
 
-      const a=$("#a_1-temperatura").val();
-      const b=$("#b_1-temperatura").val();
-      const c=$("#c_1-temperatura").val();
+        const rangoManana = { a: a, b: b }; // 6:00 a 12:00
+        const rangoTarde = { b: b, c: c }; // 12:00 a 18:00
 
-      const rangoManana = { a: a, b: b }; // 6:00 a 12:00
-      const rangoTarde = { b: b, c: c }; // 12:00 a 18:00
+        const datosFiltrados = obtenerDatosFiltradosBarra("Temperatura").slice().reverse();
+        const promedios = procesarDatos(datosFiltrados, rangoManana, rangoTarde);
 
-      const datosFiltrados = obtenerDatosFiltradosBarra("Temperatura");
-      const promedios = procesarDatos(datosFiltrados, rangoManana, rangoTarde);
+        const categorias = promedios.length ? promedios.map((p) => p.dia) : ["Sin datos"];
+        const dataManana = promedios.length ? promedios.map((p) => p.manana || 0) : [0];
+        const dataTarde = promedios.length ? promedios.map((p) => p.tarde || 0) : [0];
+        const dataNoche = promedios.length ? promedios.map((p) => p.noche || 0) : [0];
 
-      const categorias = promedios.map((p) => p.dia); // Días en el eje X
-      const dataManana = promedios.map((p) => p.manana);
-      const dataTarde = promedios.map((p) => p.tarde);
-      const dataNoche = promedios.map((p) => p.noche);
 
-      const options = {
-        series: [
-          { name: 'Mañana', data: dataManana },
-          { name: 'Tarde', data: dataTarde },
-          { name: 'Noche', data: dataNoche },
-        ],
-        xaxis: {
-          categories: categorias,
-        },
-      };
+        const options = {
+          series: [
+            { name: 'Mañana', data: dataManana, type: 'bar', group: 'apexcharts-axis-0' },
+            { name: 'Tarde', data: dataTarde, type: 'bar', group: 'apexcharts-axis-0' },
+            { name: 'Noche', data: dataNoche, type: 'bar', group: 'apexcharts-axis-0' },
+          ],
+          xaxis: {
+            categories: categorias,
+          },
+        };
+        const isSeriesValid = options.series.every((serie) => Array.isArray(serie.data) && serie.data.length > 0);
 
-      // Si la gráfica ya existe, actualiza los datos
-      if (chartTemperaturaBarra) {
-        chartTemperaturaBarra.updateOptions(options);
-      } else {
-        // Si no existe, inicializa la gráfica
+        if (!isSeriesValid) {
+          console.warn("Las series tienen datos inválidos:", options.series);
+          return; // No actualices si los datos son inválidos
+        }
+        console.log("Opciones enviadas a ApexCharts:", options);
+        console.log("Categorías:", categorias);
+        console.log("Serie Mañana:", dataManana);
+        console.log("Serie Tarde:", dataTarde);
+        console.log("Serie Noche:", dataNoche);
+        console.log("Promedios: ",promedios);
+        console.log("Datos filtrados",datosFiltrados)
+        // Si la gráfica ya existe, actualiza los datos
+        if (chartTemperaturaBarra) {
+          chartTemperaturaBarra.destroy();
+        }
         chartTemperaturaBarra = new ApexCharts(document.querySelector("#graficoTemperaturaPromedios"), {
           ...options,
           chart: { type: 'bar', height: 350 },
@@ -1334,41 +1381,65 @@
           },
         });
         chartTemperaturaBarra.render();
+
+      }else {
+        Swal.fire({
+          title: 'Error al aplicar filtros',
+          text: 'Ingrese los filtros de rango correctamente',
+          icon: 'error',
+          confirmButtonText: 'Entendido',
+        });
       }
     }
 
     function recargarGraficoHumedadBarra() {
+      if(validarRangoCorrectoHumedad()){
 
-      const a=$("#a_1-humedad").val();
-      const b=$("#b_1-humedad").val();
-      const c=$("#c_1-humedad").val();
+        const a = convertirHoraADecimal($("#a_1-humedad").val());
+        const b = convertirHoraADecimal($("#b_1-humedad").val());
+        const c = convertirHoraADecimal($("#c_1-humedad").val());
 
-      const rangoManana = { a: a, b: b }; // 6:00 a 12:00
-      const rangoTarde = { b: b, c: c }; // 12:00 a 18:00
+        const rangoManana = { a: a, b: b }; // 6:00 a 12:00
+        const rangoTarde = { b: b, c: c }; // 12:00 a 18:00
 
-      const datosFiltrados = obtenerDatosFiltradosBarra("Humedad");
-      const promedios = procesarDatos(datosFiltrados, rangoManana, rangoTarde);
 
-      const categorias = promedios.map((p) => p.dia); // Días en el eje X
-      const dataManana = promedios.map((p) => p.manana);
-      const dataTarde = promedios.map((p) => p.tarde);
-      const dataNoche = promedios.map((p) => p.noche);
+        console.log(rangoManana,rangoTarde)
 
-      const options = {
-        series: [
-          { name: 'Mañana', data: dataManana },
-          { name: 'Tarde', data: dataTarde },
-          { name: 'Noche', data: dataNoche },
-        ],
-        xaxis: {
-          categories: categorias,
-        },
-      };
+        const datosFiltrados = obtenerDatosFiltradosBarra("Humedad").slice().reverse();
+        datosFiltrados.reverse();
+        const promedios = procesarDatos(datosFiltrados, rangoManana, rangoTarde);
+        const categorias = promedios.length ? promedios.map((p) => p.dia) : ["Sin datos"];
+        const dataManana = promedios.length ? promedios.map((p) => p.manana || 0) : [0];
+        const dataTarde = promedios.length ? promedios.map((p) => p.tarde || 0) : [0];
+        const dataNoche = promedios.length ? promedios.map((p) => p.noche || 0) : [0];
 
-      // Si la gráfica ya existe, actualiza los datos
-      if (chartHumedadBarra) {
-        chartHumedadBarra.updateOptions(options);
-      } else {
+
+        const options = {
+          series: [
+            { name: 'Mañana', data: dataManana, type: 'bar', group: 'apexcharts-axis-0' },
+            { name: 'Tarde', data: dataTarde, type: 'bar', group: 'apexcharts-axis-0' },
+            { name: 'Noche', data: dataNoche, type: 'bar', group: 'apexcharts-axis-0' },
+          ],
+          xaxis: {
+            categories: categorias,
+          },
+        };
+
+        const isSeriesValid = options.series.every((serie) => Array.isArray(serie.data) && serie.data.length > 0);
+
+        if (!isSeriesValid) {
+          console.warn("Las series tienen datos inválidos:", options.series);
+          return; // No actualices si los datos son inválidos
+        }
+        console.log("Opciones enviadas a ApexCharts:", options);
+        console.log("Categorías:", categorias);
+        console.log("Serie Mañana:", dataManana);
+        console.log("Serie Tarde:", dataTarde);
+        console.log("Serie Noche:", dataNoche);
+        // Si la gráfica ya existe, actualiza los datos
+        if (chartHumedadBarra) {
+          chartHumedadBarra.destroy();
+        }
         // Si no existe, inicializa la gráfica
         chartHumedadBarra = new ApexCharts(document.querySelector("#graficoHumedadPromedios"), {
           ...options,
@@ -1401,9 +1472,20 @@
           },
         });
         chartHumedadBarra.render();
+      }else {
+        Swal.fire({
+          title: 'Error al aplicar filtros',
+          text: 'Ingrese los filtros de rango correctamente',
+          icon: 'error',
+          confirmButtonText: 'Entendido',
+        });
       }
     }
 
+    function convertirHoraADecimal(hora) {
+      const [hh, mm] = hora.split(':').map(Number); // Separa HH y MM y los convierte a número
+      return hh + mm / 60; // Convierte a formato decimal
+    }
 
   </script>
 
