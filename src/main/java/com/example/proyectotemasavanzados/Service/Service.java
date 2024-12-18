@@ -3,6 +3,7 @@ import com.example.proyectotemasavanzados.Entity.Dato;
 import com.example.proyectotemasavanzados.Entity.Salon;
 import com.example.proyectotemasavanzados.Repository.DatoRepository;
 import com.example.proyectotemasavanzados.Repository.SalonRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -30,8 +31,8 @@ public class Service {
 
     @PostMapping("/registrarDato")
     public ResponseEntity<HashMap<String, Object>> registrarDato(@RequestBody Map<String, Object> body) {
-        List<HashMap<String,Object>> lista = (List<HashMap<String, Object>>) body.get("lista");
-        for(HashMap<String,Object> elemento: lista){
+        List<Map<String,Object>> lista = (List<Map<String, Object>>) body.get("lista");
+        for(Map<String,Object> elemento: lista){
             String temperatura=(String) elemento.get("Temperatura");
             temperatura=temperatura.split("°")[0];
             String humedad=(String) elemento.get("Humedad");
@@ -52,7 +53,10 @@ public class Service {
                 dato.setTemperatura(new BigDecimal(temperatura));
                 dato.setHumedad(new BigDecimal(humedad));
                 datoRepository.save(dato);
-                simpMessagingTemplate.convertAndSend("/topic/recibirDato",dato);
+                HashMap<String,Object> ola = new HashMap<>();
+                ola.put("dato",dato);
+                ola.put("salon",salon);
+                simpMessagingTemplate.convertAndSend("/topic/recibirDato",ola);
             }
         }
         return null;
@@ -69,10 +73,22 @@ public class Service {
 
     @GetMapping("/datosPorSalon/{salon}")
     public ResponseEntity<HashMap<String, Object>> obtenerDatosPorSalon(@PathVariable(value = "salon") String salon) {
-        List<Dato> datosFiltrados = datoRepository.listarDatosPorSalon(salon);
         HashMap<String, Object> response = new HashMap<>();
-        response.put("content", datosFiltrados);
+        response.put("content", datoRepository.listarDatosPorSalon(salon));
         response.put("status", "success");
         return ResponseEntity.ok(response);
+    }
+
+    @RestControllerAdvice
+    public class GlobalExceptionHandler {
+
+        @ExceptionHandler(Exception.class)
+        public ResponseEntity<HashMap<String, Object>> handleException(Exception ex) {
+            ex.printStackTrace(); // Para depurar
+            HashMap<String, Object> response = new HashMap<>();
+            response.put("status", "error");
+            response.put("message", ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 }

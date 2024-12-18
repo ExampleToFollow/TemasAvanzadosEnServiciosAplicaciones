@@ -96,7 +96,6 @@
     .statistics {
       padding: 20px;
       width: 100%;
-      max-width: 1000px;
       margin: 0 auto;
     }
 
@@ -180,29 +179,53 @@
   </div>
   <div class="statistics">
     <h2>Gráficos</h2>
-    <div class="time-range-selector">
-      <span style="font-weight: bolder;font-size: 150%">Temperatura VS Tiempo</span>
-      <label for="tiempoInicioGraficoTemperaturaAreas">Inicio:</label>
-      <input type="datetime-local" id="tiempoInicioGraficoTemperaturaAreas">
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="time-range-selector">
+          <span style="font-weight: bolder;font-size: 150%">Temperatura VS Tiempo</span>
+          <label for="tiempoInicioGraficoTemperaturaAreas">Inicio:</label>
+          <input type="datetime-local" id="tiempoInicioGraficoTemperaturaAreas">
 
-      <label for="tiempoFinalGraficoTemperaturaAreas">Fin:</label>
-      <input type="datetime-local" id="tiempoFinalGraficoTemperaturaAreas">
+          <label for="tiempoFinalGraficoTemperaturaAreas">Fin:</label>
+          <input type="datetime-local" id="tiempoFinalGraficoTemperaturaAreas">
 
-      <button class="apply-button" onclick="recargarGraficoTemperaturaArea()">Aplicar</button>
+          <button class="apply-button" onclick="recargarGraficoTemperaturaArea()">Aplicar</button>
+        </div>
+        <div id="graficoTemperaturaArea"></div>
+        <br>
+      </div>
+      <div class="col-lg-6">
+        <div class="time-range-selector">
+          <span style="font-weight: bolder;font-size: 150%">Humedad VS Tiempo</span>
+          <label for="tiempoInicioGraficoHumedadAreas">Inicio:</label>
+          <input type="datetime-local" id="tiempoInicioGraficoHumedadAreas">
+
+          <label for="tiempoFinalGraficoHumedadAreas">Fin:</label>
+          <input type="datetime-local" id="tiempoFinalGraficoHumedadAreas">
+
+          <button class="apply-button" onclick="recargarGraficoHumedadArea()">Aplicar</button>
+        </div>
+        <div id="graficoHumedadArea"></div>
+      </div>
     </div>
-    <div id="graficoTemperaturaArea"></div>
-    <br>
-    <div class="time-range-selector">
-      <span style="font-weight: bolder;font-size: 150%">Humedad VS Tiempo</span>
-      <label for="tiempoInicioGraficoHumedadAreas">Inicio:</label>
-      <input type="datetime-local" id="tiempoInicioGraficoHumedadAreas">
+    <div style="height: 100px;width: 100%"></div>
+    <div class="row">
+      <div class="col-lg-6">
+        <div style="width: 100%;display: flex; justify-content: space-around">
+          <span>Rangos: </span>
+          <input type="time" disabled value="00:00">
+          <input type="time" id="a">
+          <input type="time" id="b">
+          <input type="time" id="c">
+          <input type="time" disabled value="23:59">
+        </div>
+        <div class="row">
 
-      <label for="tiempoFinalGraficoHumedadAreas">Fin:</label>
-      <input type="datetime-local" id="tiempoFinalGraficoHumedadAreas">
-
-      <button class="apply-button" onclick="recargarGraficoHumedadArea()">Aplicar</button>
+        </div>
+        <div id="graficoTemperaturaPromedios"></div>
+        <br>
+      </div>
     </div>
-    <div id="graficoHumedadArea"></div>
   </div>
   <div class="statistics">
     <h2>Estadísticas</h2>
@@ -248,6 +271,32 @@
     const DateTime = luxon.DateTime;
     let timeout;
     const limiteSinRecibirDatos=20;
+
+
+    // Función para obtener la fecha y hora actual en formato 'YYYY-MM-DDTHH:MM'
+    function obtenerFechaActual() {
+      const ahora = new Date();
+      const anio = ahora.getFullYear();
+      const mes = String(ahora.getMonth() + 1).padStart(2, '0'); // Mes: 01-12
+      const dia = String(ahora.getDate()).padStart(2, '0');      // Día: 01-31
+      const horas = String(ahora.getHours()).padStart(2, '0');
+      const minutos = String(ahora.getMinutes()).padStart(2, '0');
+
+      return `${anio}-${mes}-${dia}T${horas}:${minutos}`;
+    }
+
+    // Función para obtener la fecha y hora hace exactamente 1 día en formato 'YYYY-MM-DDTHH:MM'
+    function obtenerFechaHaceUnDia() {
+      const haceUnDia = new Date();
+      haceUnDia.setDate(haceUnDia.getDate() - 1); // Restar 1 día
+      const anio = haceUnDia.getFullYear();
+      const mes = String(haceUnDia.getMonth() + 1).padStart(2, '0');
+      const dia = String(haceUnDia.getDate()).padStart(2, '0');
+      const horas = String(haceUnDia.getHours()).padStart(2, '0');
+      const minutos = String(haceUnDia.getMinutes()).padStart(2, '0');
+
+      return `${anio}-${mes}-${dia}T${horas}:${minutos}`;
+    }
 
     function ejecutarAccionInactividad() {
       Swal.fire({
@@ -348,6 +397,8 @@
       }else {
         const datosLocales=obtenerDatosFiltrados("Temperatura");
         calcularRegresionLineal("Temperatura");
+        console.log(mTemperaturaArea,bTemperaturaArea)
+
         chartTemperaturaArea.updateSeries([{
           name: 'Temperatura (C°)',
           data: datosLocales.map(function (dato){
@@ -355,7 +406,7 @@
           })
         },
           {
-            name: `Tendencia ${mTemperaturaArea < 0 ? "(disminuir" : "(aumentar"} ${Math.abs(mTemperaturaArea * 3600000).toFixed(2)} C° cada hora)`,
+            name: `Tendencia ${mTemperaturaArea < 0 ? "(disminuir" : "(aumentar"} ${Math.abs(mTemperaturaArea * 36000000).toFixed(2)} C° cada hora)`,
             data: generarPuntosRegresion(mTemperaturaArea,bTemperaturaArea,datosLocales),
             type: 'line'
           }]);
@@ -375,7 +426,7 @@
           })
         },
           {
-            name: `Tendencia ${mHumedadArea < 0 ? "(disminuir " : "(aumentar "} ${Math.abs(mHumedadArea * 3600000).toFixed(2)}% cada hora)`,
+            name: `Tendencia ${mHumedadArea < 0 ? "(disminuir " : "(aumentar "} ${Math.abs(mHumedadArea * 36000000).toFixed(2)}% cada hora)`,
             data: generarPuntosRegresion(mHumedadArea,bHumedadArea,datosLocales),
             type: 'line'
           }]);
@@ -387,9 +438,9 @@
       const puntosRegresion = generarPuntosRegresion(mTemperaturaArea, bTemperaturaArea,datos);
       let tendencia;
       if(mTemperaturaArea<0){
-        tendencia="Tendencia (disminuir "+(mTemperaturaArea*-3600000).toFixed(2)+" C° cada hora)";
+        tendencia="Tendencia (disminuir "+(mTemperaturaArea*-36000000).toFixed(2)+" C° cada hora)";
       }else {
-        tendencia="Tendencia (aumentar "+(mTemperaturaArea*3600000).toFixed(2)+" C° cada hora)";
+        tendencia="Tendencia (aumentar "+(mTemperaturaArea*36000000).toFixed(2)+" C° cada hora)";
       }
 
       const options = {
@@ -460,7 +511,12 @@
         tooltip: {
           x: {
             format: 'dd MMM HH:mm'
-          }
+          },
+          y: {
+            formatter: function (val) {
+              return val.toFixed(2) + ' °C';
+            },
+          },
         }
       };
 
@@ -471,6 +527,7 @@
     function cargarGraficoHumedadArea(){
       calcularRegresionLineal("Humedad");
       const puntosRegresion = generarPuntosRegresion(mHumedadArea, bHumedadArea,datos);
+      console.log(puntosRegresion)
       let tendencia;
       if(mHumedadArea<0){
         tendencia="Tendencia (disminuir "+(mHumedadArea*-3600000).toFixed(2)+"% cada hora)";
@@ -491,8 +548,6 @@
           {
             name: 'Humedad (%)',
             data: datos.map(function (dato){
-              console.log(dato.timestamp)
-              console.log(new Date(dato.timestamp.replace(' ', 'T')).getTime())
               return {x:obtenerHoraTimestamp(dato.timestamp),y:dato.humedad}
             }),
             fill: {
@@ -607,9 +662,12 @@
     }
 
     async function cargarPagina(){
+      $("#tiempoFinalGraficoHumedadAreas").val(obtenerFechaActual());
+      $("#tiempoFinalGraficoTemperaturaAreas").val(obtenerFechaActual());
+      $("#tiempoInicioGraficoHumedadAreas").val(obtenerFechaHaceUnDia());
+      $("#tiempoInicioGraficoTemperaturaAreas").val(obtenerFechaHaceUnDia());
+
       datos=await obtenerDatos();
-      console.log(datos)
-      console.log(salonActivo)
       for(let i=0;i<datos.length;i++){
         agregarFila(datos[i]);
       }
@@ -617,12 +675,21 @@
       recibirDato(ultimoDato);
       cargarGraficoTemperaturaArea();
       cargarGraficoHumedadArea();
+      recargarGraficoTemperaturaArea()
+      recargarGraficoHumedadArea()
+      // Ejemplo de uso:
+
+      const rangoManana = { a: 6, b: 12 }; // 6:00 a 12:00
+      const rangoTarde = { b: 12, c: 18 }; // 12:00 a 18:00
+
+      const promedios = procesarDatos(datos, rangoManana, rangoTarde);
+      generarGrafica(promedios);
     }
     cargarPagina();
 
     function cargarDatosPorSalon(salon) {
       $.ajax({
-        url: `/datosPorSalon/${salon}`,
+        url: "/datosPorSalon/" + salonActivo,
         method: "GET",
         success: function(response) {
           if (response.status === "success") {
@@ -645,11 +712,21 @@
             actualizarGraficos(datos);
           }
         },
-        error: function() {
-          Swal.fire("Error", "No se pudieron cargar los datos del salón", "error");
+        error: function(jqXHR, textStatus, errorThrown) {
+          console.error("Estado del error:", textStatus);
+          console.error("Error lanzado:", errorThrown);
+          console.error("Respuesta del servidor:", jqXHR.responseText);
+
+          // Mostrar un mensaje detallado al usuario (opcional)
+          Swal.fire(
+                  "Error 500",
+                  "No se pudieron cargar los datos del salón. Detalles: " + jqXHR.responseText,
+                  "error"
+          );
         }
       });
     }
+
 
     function actualizarGraficos(datos) {
       const temperaturas = datos.map(dato => ({ x: dato.timestamp, y: dato.temperatura }));
@@ -671,20 +748,16 @@
       tabla.order([0, 'desc']).draw();
     }
 
-
-    cargarDatosPorSalon(salonActivo);
-
-  </script>
-  <script>
     let stompClient = null;
     function connect() {
       let socket = new SockJS('/message');
       stompClient = Stomp.over(socket);
       stompClient.connect({}, function (frame) {
         stompClient.subscribe('/topic/recibirDato', function (messageOutput) {
-          const nuevoDato=JSON.parse(messageOutput.body);
+          const nuevoDato=JSON.parse(messageOutput.body).dato;
+          const nuevoSalon=JSON.parse(messageOutput.body).salon;
 
-          if (nuevoDato.salon.nombre === salonActivo) {
+          if (nuevoSalon === salonActivo) {
             recibirDato(nuevoDato);
             agregarFila(nuevoDato);
             datos.push(nuevoDato);
@@ -706,6 +779,7 @@
     }
 
     function recibirDato(dato){
+      console.log(dato)
       const temperaturaRecibida=dato.temperatura;
       const humedadRecibida=dato.humedad;
       const elementoTemperatura=$("#temperatura");
@@ -735,6 +809,121 @@
 
     }
     connect();
+
+
+    // Función para procesar los datos
+    function procesarDatos(datos, rangoManana, rangoTarde) {
+      const { a: inicioManana, b: finManana } = rangoManana;
+      const { b: inicioTarde, c: finTarde } = rangoTarde;
+
+      // Objeto para almacenar las temperaturas por día y rango
+      const resultados = {};
+
+
+      datos.forEach(({ temperatura, timestamp }) => {
+        const fechaCompleta = new Date(timestamp);
+        const dia = fechaCompleta.toISOString().split('T')[0]; // Obtiene solo el día (YYYY-MM-DD)
+        const hora = fechaCompleta.getHours() + fechaCompleta.getMinutes() / 60;
+
+        if (!resultados[dia]) {
+          resultados[dia] = {
+            manana: [],
+            tarde: [],
+            noche: [],
+          };
+        }
+
+        if (hora >= inicioManana && hora < finManana) {
+          resultados[dia].manana.push(temperatura);
+        } else if (hora >= inicioTarde && hora < finTarde) {
+          resultados[dia].tarde.push(temperatura);
+        } else {
+          resultados[dia].noche.push(temperatura);
+        }
+      });
+
+      // Calcula los promedios por día y rango
+      const dias = Object.keys(resultados);
+      const promedios = dias.map((dia) => {
+        const { manana, tarde, noche } = resultados[dia];
+
+        return {
+          dia,
+          manana: promedio(manana),
+          tarde: promedio(tarde),
+          noche: promedio(noche),
+        };
+      });
+
+      return promedios;
+    }
+
+    // Función para calcular el promedio de un arreglo
+    function promedio(arreglo) {
+      if (arreglo.length === 0) return 0;
+      const suma = arreglo.reduce((acc, val) => acc + val, 0);
+      return suma / arreglo.length;
+    }
+
+    // Función para generar la gráfica con ApexCharts
+    function generarGrafica(promedios) {
+      const categorias = promedios.map((p) => p.dia); // Días en el eje X
+      const dataManana = promedios.map((p) => p.manana);
+      const dataTarde = promedios.map((p) => p.tarde);
+      const dataNoche = promedios.map((p) => p.noche);
+
+      const options = {
+        series: [
+          { name: 'Mañana', data: dataManana },
+          { name: 'Tarde', data: dataTarde },
+          { name: 'Noche', data: dataNoche },
+        ],
+        chart: {
+          type: 'bar',
+          height: 350,
+        },
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            columnWidth: '55%',
+            borderRadius: 5,
+            borderRadiusApplication: 'end',
+          },
+        },
+        dataLabels: {
+          enabled: false,
+        },
+        stroke: {
+          show: true,
+          width: 2,
+          colors: ['transparent'],
+        },
+        xaxis: {
+          categories: categorias,
+        },
+        yaxis: {
+          title: {
+            text: 'Temperatura (°C)'
+          },
+          decimalsInFloat: 1
+        },
+        fill: {
+          opacity: 1,
+        },
+        tooltip: {
+          y: {
+            formatter: function (val) {
+              return val.toFixed(2) + ' °C';
+            },
+          },
+        },
+      };
+
+      const chart = new ApexCharts(document.querySelector("#graficoTemperaturaPromedios"), options);
+      chart.render();
+    }
+
+
   </script>
 
 

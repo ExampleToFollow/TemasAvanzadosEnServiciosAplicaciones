@@ -1,20 +1,23 @@
 package com.example.proyectotemasavanzados.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
 @Table(name = "datos")
-public class Dato {
+public class Dato implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false,fetch = FetchType.EAGER)
     @JoinColumn(name = "id_salon", nullable = false)
+    @JsonIgnore
     private Salon salon;
 
     @Column(name = "id_dispositivo", nullable = false, length = 1000)

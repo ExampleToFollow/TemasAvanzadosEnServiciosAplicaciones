@@ -12,6 +12,6 @@ public interface DatoRepository extends JpaRepository<Dato, Integer> {
     List<Dato> findBySalonNombre(String nombreSalon);
 
 
-    @Query(nativeQuery = true,value = "select d.* from datos d inner join salon s on d.id_salon=s.id where s.nombre=?1 order by d.timestamp desc")
+    @Query(nativeQuery = true,value = "select d.* from datos d inner join salon s on d.id_salon=s.id where s.nombre=?1 order by timestamp desc")
     List<Dato> listarDatosPorSalon(String salon);
 }
