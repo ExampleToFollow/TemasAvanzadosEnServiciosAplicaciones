@@ -147,163 +147,454 @@
     .apply-button:hover {
       background-color: #005bb5;
     }
+
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    .cont {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .mail {
+      grid-column: span 2;
+      height: 430px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .mail {
+      grid-column: span 2;
+    }
+
+    .drive {
+      grid-column: span 2;
+      height: 400px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .notes {
+      grid-column: span 1;
+      height: 397px; /* Ajusta según tus necesidades */
+      margin-top: 2px;
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: all 400ms ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .notes:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+    }
+
+
+    /* Slider estilo */
+    .hygro-slider {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .hygrometer-card {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      width: 260px;
+      margin: auto;
+    }
+
+    svg {
+      display: block;
+      margin: auto;
+    }
+
+    #needle {
+      transform-origin: 110px 110px;
+      transition: transform 0.5s ease;
+    }
+
+
+
+
+    .hygro-info h3 {
+      margin: 0;
+      text-align: center;
+      font-size: 1.2rem;
+      margin-bottom: 5px;
+    }
+
+    .hygro-info p {
+      margin: 0;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+
+
+    .info {
+      justify-content: center;
+    }
+
+    .info h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .info p {
+      margin: 5px 0;
+      font-size: 16px;
+      color: #666;
+    }
+    .fw-bold {
+      font-weight: bold;
+    }
+
+    @media screen and (max-width:800px) {
+      .content-modal{
+        width: 90%;
+      }
+    }
+
+    .avatar5 {
+      background-size: 100%;
+      background-image: url('https://cdn-icons-png.flaticon.com/256/2100/2100100.png'); /* Ícono del termómetro */
+      background-position: center;
+      background-repeat: no-repeat;
+      color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      height: 80px;
+      width: 80px;
+      margin-right: 20px;
+    }
+
+    .avatar5::before {
+      content: '';
+    }
+
+    /* Contenedor general para las 4 cards */
+    .bienestar-container {
+      display: flex;
+      flex-direction: column; /* Cards una debajo de otra */
+      justify-content: space-between; /* Espacio entre cards */
+      height: 100%; /* Ocupar el 100% de la altura */
+    }
+
+    .mini-card {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      height: auto; /* Ajuste automático de altura */
+    }
+
+    /* Avatar personalizado para el ícono */
+    .mini-card .avatar.temperature-icon {
+      /* Color de fondo rojo */
+      background-image: url('https://cdn-icons-png.flaticon.com/256/2100/2100100.png'); /* Ícono del termómetro */
+      background-size: 100%;
+      background-position: center;
+      background-repeat: no-repeat;
+      width: 60px;
+      height: 60px;
+      margin-right: 15px;
+    }
+
+    /* Información de la card */
+    .mini-card .info h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .mini-card .info .last-update {
+      margin: 5px 0;
+      font-size: 12px;
+      color: #999;
+    }
+
+    /* Sección de temperatura */
+    .mini-card .temperature {
+      font-size: 24px;
+      font-weight: bold;
+      color: #d32f2f; /* Color rojo */
+    }
+
+    .mini-card .temperature .temp-value {
+      font-family: Arial, sans-serif;
+    }
+    /* Estilo del Topbar */
+    .topbar5 {
+      background-color: #005f52; /* Color de fondo */
+      color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      font-family: Arial, sans-serif;
+    }
+
+    .topbar5-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .topbar5 .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .topbar5 .logo small {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: normal;
+      color: #e0e0e0;
+    }
+
+    .topbar5-title h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: normal;
+    }
+
+    .topbar5-expand i {
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <img src="/logotelecom.jpg" alt="Logo Ingeniería">
-  </header>
+  <div id="loader-container"  style="display: flex;flex-direction: column;">
 
-  <nav>
-    <a href="/Inicio/V305"
-       th:classappend="${nombreSalon == 'V305'} ? 'active' : ''">V305</a>
-    <a href="/Inicio/V306"
-       th:classappend="${nombreSalon == 'V306'} ? 'active' : ''">V306</a>
-    <a href="/Inicio/V307"
-       th:classappend="${nombreSalon == 'V307'} ? 'active' : ''">V307</a>
-  </nav>
+    <header>
+      <a href="/Inicio"><img src="/logotelecom.jpg" alt="Logo Ingeniería"></a>
+    </header>
 
 
-  <div class="main">
-    <h2><span>TEMPERATURA Y HUMEDAD</span></h2>
-    <div class="card" style="padding-bottom: 5px!important;display: flex;position: relative">
-      <img id="noConexion" src="/iconNoWifi.png" alt="" style="width: 20%;position: absolute;z-index: 1000;top: 0;right: 0;display: none">
-      <h3 id="temperatura" style="font-weight: bold"></h3>
-      <div class="info">
-        <p id="humedad" class="humidity-icon" style="font-weight: bold"></p>
+    <div id="loader-wrapper"  class="loader-wrapper">
+
+      <div class="loader">
+        <div class="roller"></div>
+        <div class="roller"></div>
       </div>
-      <div style="width: 100%;justify-content: right;display: flex">
-        <p id="hora"></p>
+
+      <div id="loader2" class="loader">
+        <div class="roller"></div>
+        <div class="roller"></div>
+      </div>
+
+      <div id="loader3" class="loader">
+        <div class="roller"></div>
+        <div class="roller"></div>
       </div>
     </div>
+
   </div>
-  <div class="statistics">
-    <h2>Gráficos</h2>
-    <div class="row">
-      <div class="col-lg-6">
-        <div class="time-range-selector">
-          <span style="font-weight: bolder;font-size: 150%">Temperatura VS Tiempo</span>
-          <label for="tiempoInicioGraficoTemperaturaAreas">Inicio:</label>
-          <input type="datetime-local" id="tiempoInicioGraficoTemperaturaAreas">
-
-          <label for="tiempoFinalGraficoTemperaturaAreas">Fin:</label>
-          <input type="datetime-local" id="tiempoFinalGraficoTemperaturaAreas">
-
-          <button class="apply-button" onclick="recargarGraficoTemperaturaArea()">Aplicar</button>
+  <div id="content-show" class="hidden">
+    <!-- Topbar -->
+    <div class="topbar5">
+      <div class="topbar5-content">
+        <div class="logo">
+          <span>IOT<span style="color: #f7931e;">dashboard</span></span>
+          <small>By Niurka y sus amigos.</small>
         </div>
-        <div id="graficoTemperaturaArea"></div>
-        <br>
-      </div>
-      <div class="col-lg-6">
-        <div class="time-range-selector">
-          <span style="font-weight: bolder;font-size: 150%">Humedad VS Tiempo</span>
-          <label for="tiempoInicioGraficoHumedadAreas">Inicio:</label>
-          <input type="datetime-local" id="tiempoInicioGraficoHumedadAreas">
-
-          <label for="tiempoFinalGraficoHumedadAreas">Fin:</label>
-          <input type="datetime-local" id="tiempoFinalGraficoHumedadAreas">
-
-          <button class="apply-button" onclick="recargarGraficoHumedadArea()">Aplicar</button>
+        <div class="topbar5-title">
+          <h2>Monitoreo de temperatura y humedad</h2>
         </div>
-        <div id="graficoHumedadArea"></div>
+        <div class="topbar5-expand">
+
+        </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-lg-6">
-        <div class="row">
-          <div class="time-range-selector" style="display: flex;align-items: center">
-            <span style="font-weight: bolder;font-size: 150%">Promedios de temperatura por día</span>
-            <label for="tiempoInicioGraficoTemperaturaBarras">Inicio:</label>
-            <input type="datetime-local" id="tiempoInicioGraficoTemperaturaBarras">
+    <nav>
+      <a href="/Inicio/V305"
+         th:classappend="${nombreSalon == 'V305'} ? 'active' : ''">V305</a>
+      <a href="/Inicio/V306"
+         th:classappend="${nombreSalon == 'V306'} ? 'active' : ''">V306</a>
+      <a href="/Inicio/V307"
+         th:classappend="${nombreSalon == 'V307'} ? 'active' : ''">V307</a>
+    </nav>
 
-            <label for="tiempoFinalGraficoTemperaturaBarras">Fin:</label>
-            <input type="datetime-local" id="tiempoFinalGraficoTemperaturaBarras">
 
-            <button class="apply-button" onclick="recargarGraficoTemperaturaBarra()">Aplicar</button>
-          </div>
-          <span style="font-weight: bold">Rangos: </span>
-          <div class="col-6" style="display: flex;justify-content: space-around">
-            <span>Noche (1): </span>
-            <input style="width: fit-content" class="form-control" type="time" disabled value="00:00">
-            <input onchange="aux()" style="width: fit-content" class="form-control" type="time" value="06:00" id="a_1-temperatura">
-          </div>
-          <div class="col-6" style="display: flex;justify-content: space-around">
-            <span>Mañana: </span>
-            <input style="width: fit-content" class="form-control" value="06:00" type="time" id="a_2-temperatura">
-            <input style="width: fit-content" class="form-control" value="12:00" type="time" id="b_1-temperatura">
-          </div>
-          <div class="col-6" style="display: flex;justify-content: space-around">
-            <span>Tarde: </span>
-            <input style="width: fit-content" class="form-control" value="12:00" type="time" id="b_2-temperatura">
-            <input style="width: fit-content" class="form-control" value="18:00" type="time" id="c_1-temperatura">
-          </div>
-          <div class="col-6" style="display: flex;justify-content: space-around">
-            <span>Noche (2): </span>
-            <input style="width: fit-content" class="form-control" value="18:00" type="time" id="c_2-temperatura">
-            <input style="width: fit-content" class="form-control" type="time" disabled value="23:59">
-          </div>
+    <div class="main">
+      <h2><span>TEMPERATURA Y HUMEDAD</span></h2>
+      <div class="card" style="padding-bottom: 5px!important;display: flex;position: relative">
+        <img id="noConexion" src="/iconNoWifi.png" alt="" style="width: 20%;position: absolute;z-index: 1000;top: 0;right: 0;display: none">
+        <h3 id="temperatura" style="font-weight: bold"></h3>
+        <div class="info">
+          <p id="humedad" class="humidity-icon" style="font-weight: bold"></p>
         </div>
-        <div id="graficoTemperaturaPromedios"></div>
-        <br>
-      </div>
-      <div class="col-lg-6">
-        <div class="row">
-          <div class="time-range-selector" style="display: flex;align-items: center">
-            <span style="font-weight: bolder;font-size: 150%">Promedios de temperatura por día</span>
-            <label for="tiempoInicioGraficoHumedadBarras">Inicio:</label>
-            <input type="datetime-local" id="tiempoInicioGraficoHumedadBarras">
-
-            <label for="tiempoFinalGraficoHumedadBarras">Fin:</label>
-            <input type="datetime-local" id="tiempoFinalGraficoHumedadBarras">
-
-            <button class="apply-button" onclick="recargarGraficoHumedadBarra()">Aplicar</button>
-          </div>
-          <span style="font-weight: bold">Rangos: </span>
-          <div class="col-6" style="display: flex;justify-content: space-around">
-            <span>Noche (1): </span>
-            <input style="width: fit-content" class="form-control" type="time" disabled value="00:00">
-            <input style="width: fit-content" class="form-control" type="time" value="06:00" id="a_1-humedad">
-          </div>
-          <div class="col-6" style="display: flex;justify-content: space-around">
-            <span>Mañana: </span>
-            <input style="width: fit-content" class="form-control" value="06:00" type="time" id="a_2-humedad">
-            <input style="width: fit-content" class="form-control" value="12:00" type="time" id="b_1-humedad">
-          </div>
-          <div class="col-6" style="display: flex;justify-content: space-around">
-            <span>Tarde: </span>
-            <input style="width: fit-content" class="form-control" value="12:00" type="time" id="b_2-humedad">
-            <input style="width: fit-content" class="form-control" value="18:00" type="time" id="c_1-humedad">
-          </div>
-          <div class="col-6" style="display: flex;justify-content: space-around">
-            <span>Noche (2): </span>
-            <input style="width: fit-content" class="form-control" value="18:00" type="time" id="c_2-humedad">
-            <input style="width: fit-content" class="form-control" type="time" disabled value="23:59">
-          </div>
+        <div style="width: 100%;justify-content: right;display: flex">
+          <p id="hora"></p>
         </div>
-        <div id="graficoHumedadPromedios"></div>
-        <br>
       </div>
     </div>
+    <div class="statistics">
+      <h2>Gráficos</h2>
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="time-range-selector">
+            <span style="font-weight: bolder;font-size: 150%">Temperatura VS Tiempo</span>
+            <label for="tiempoInicioGraficoTemperaturaAreas">Inicio:</label>
+            <input type="datetime-local" id="tiempoInicioGraficoTemperaturaAreas">
+
+            <label for="tiempoFinalGraficoTemperaturaAreas">Fin:</label>
+            <input type="datetime-local" id="tiempoFinalGraficoTemperaturaAreas">
+
+            <button class="apply-button" onclick="recargarGraficoTemperaturaArea()">Aplicar</button>
+          </div>
+          <div id="graficoTemperaturaArea"></div>
+          <br>
+        </div>
+        <div class="col-lg-6">
+          <div class="time-range-selector">
+            <span style="font-weight: bolder;font-size: 150%">Humedad VS Tiempo</span>
+            <label for="tiempoInicioGraficoHumedadAreas">Inicio:</label>
+            <input type="datetime-local" id="tiempoInicioGraficoHumedadAreas">
+
+            <label for="tiempoFinalGraficoHumedadAreas">Fin:</label>
+            <input type="datetime-local" id="tiempoFinalGraficoHumedadAreas">
+
+            <button class="apply-button" onclick="recargarGraficoHumedadArea()">Aplicar</button>
+          </div>
+          <div id="graficoHumedadArea"></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="row">
+            <div class="time-range-selector" style="display: flex;align-items: center">
+              <span style="font-weight: bolder;font-size: 150%">Promedios de temperatura por día</span>
+              <label for="tiempoInicioGraficoTemperaturaBarras">Inicio:</label>
+              <input type="datetime-local" id="tiempoInicioGraficoTemperaturaBarras">
+
+              <label for="tiempoFinalGraficoTemperaturaBarras">Fin:</label>
+              <input type="datetime-local" id="tiempoFinalGraficoTemperaturaBarras">
+
+              <button class="apply-button" onclick="recargarGraficoTemperaturaBarra()">Aplicar</button>
+            </div>
+            <span style="font-weight: bold">Rangos: </span>
+            <div class="col-6" style="display: flex;justify-content: space-around">
+              <span>Noche (1): </span>
+              <input style="width: fit-content" class="form-control" type="time" disabled value="00:00">
+              <input onchange="aux()" style="width: fit-content" class="form-control" type="time" value="06:00" id="a_1-temperatura">
+            </div>
+            <div class="col-6" style="display: flex;justify-content: space-around">
+              <span>Mañana: </span>
+              <input style="width: fit-content" class="form-control" value="06:00" type="time" id="a_2-temperatura">
+              <input style="width: fit-content" class="form-control" value="12:00" type="time" id="b_1-temperatura">
+            </div>
+            <div class="col-6" style="display: flex;justify-content: space-around">
+              <span>Tarde: </span>
+              <input style="width: fit-content" class="form-control" value="12:00" type="time" id="b_2-temperatura">
+              <input style="width: fit-content" class="form-control" value="18:00" type="time" id="c_1-temperatura">
+            </div>
+            <div class="col-6" style="display: flex;justify-content: space-around">
+              <span>Noche (2): </span>
+              <input style="width: fit-content" class="form-control" value="18:00" type="time" id="c_2-temperatura">
+              <input style="width: fit-content" class="form-control" type="time" disabled value="23:59">
+            </div>
+          </div>
+          <div id="graficoTemperaturaPromedios"></div>
+          <br>
+        </div>
+        <div class="col-lg-6">
+          <div class="row">
+            <div class="time-range-selector" style="display: flex;align-items: center">
+              <span style="font-weight: bolder;font-size: 150%">Promedios de temperatura por día</span>
+              <label for="tiempoInicioGraficoHumedadBarras">Inicio:</label>
+              <input type="datetime-local" id="tiempoInicioGraficoHumedadBarras">
+
+              <label for="tiempoFinalGraficoHumedadBarras">Fin:</label>
+              <input type="datetime-local" id="tiempoFinalGraficoHumedadBarras">
+
+              <button class="apply-button" onclick="recargarGraficoHumedadBarra()">Aplicar</button>
+            </div>
+            <span style="font-weight: bold">Rangos: </span>
+            <div class="col-6" style="display: flex;justify-content: space-around">
+              <span>Noche (1): </span>
+              <input style="width: fit-content" class="form-control" type="time" disabled value="00:00">
+              <input style="width: fit-content" class="form-control" type="time" value="06:00" id="a_1-humedad">
+            </div>
+            <div class="col-6" style="display: flex;justify-content: space-around">
+              <span>Mañana: </span>
+              <input style="width: fit-content" class="form-control" value="06:00" type="time" id="a_2-humedad">
+              <input style="width: fit-content" class="form-control" value="12:00" type="time" id="b_1-humedad">
+            </div>
+            <div class="col-6" style="display: flex;justify-content: space-around">
+              <span>Tarde: </span>
+              <input style="width: fit-content" class="form-control" value="12:00" type="time" id="b_2-humedad">
+              <input style="width: fit-content" class="form-control" value="18:00" type="time" id="c_1-humedad">
+            </div>
+            <div class="col-6" style="display: flex;justify-content: space-around">
+              <span>Noche (2): </span>
+              <input style="width: fit-content" class="form-control" value="18:00" type="time" id="c_2-humedad">
+              <input style="width: fit-content" class="form-control" type="time" disabled value="23:59">
+            </div>
+          </div>
+          <div id="graficoHumedadPromedios"></div>
+          <br>
+        </div>
+      </div>
+    </div>
+    <div class="statistics">
+      <h2>Estadísticas</h2>
+
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover table-striped" id="tableSupreme">
+          <thead class="table-dark">
+          <tr>
+            <th>#</th>
+            <th>Nombre Dispositivo</th>
+            <th>Timestamp</th>
+            <th>Temperatura</th>
+            <th>Humedad</th>
+          </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
   </div>
-  <div class="statistics">
-    <h2>Estadísticas</h2>
 
-    <div class="table-responsive">
-      <table class="table table-bordered table-hover table-striped" id="tableSupreme">
-        <thead class="table-dark">
-        <tr>
-          <th>#</th>
-          <th>Nombre Dispositivo</th>
-          <th>Timestamp</th>
-          <th>Temperatura</th>
-          <th>Humedad</th>
-        </tr>
-        </thead>
-        <tbody>
-        </tbody>
-      </table>
-    </div>
-  </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>

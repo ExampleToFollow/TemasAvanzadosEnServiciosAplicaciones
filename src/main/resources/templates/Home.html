@@ -51,31 +51,7 @@
             gap: 20px;
             padding: 20px;
         }
-        .contai {
-            display: flex;
-            justify-content: space-between;
-            padding: 20px;
-        }
 
-        .profile, .mail, .drive, .notes,card {
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 400ms ease;
-        }
-        .profile:hover, .mail:hover, .drive:hover, .notes:hover, card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-        }
-        .card {
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-            width: 48%; /* Ajustar al 50% con espacio entre las tarjetas */
-            transition: all 400ms ease;
-        }
         .mail {
             grid-column: span 2;
             height: 430px;
@@ -88,16 +64,6 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .profile {
-            background: linear-gradient(135deg, #e0f7fa 0%, #f1f8e9 100%);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            grid-column: span 1;
-            height: 250px;
-        }
         .mail {
             grid-column: span 2;
         }
@@ -133,14 +99,6 @@
             box-shadow: 0 6px 10px rgba(0,0,0,0.15);
         }
 
-        .hygrometer-container {
-            width: 100%;
-            max-width: 500px;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
 
         /* Slider estilo */
         .hygro-slider {
@@ -208,83 +166,12 @@
             font-weight: bold;
         }
 
-        .fw-medium {
-            font-weight: 500;
-        }
-        /* Modal styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 130%;
-            overflow: auto;
-            background-color: rgb(0, 0, 0);
-            background-color: rgba(0, 0, 0, 0.4);
-        }
-
-        .modal-content {
-            background-color: white;
-            margin: 20% auto;  /* Adjusts the top margin for vertical centering */
-            padding: 50px;
-            border: 1px solid #888;
-            width: 90%;  /* Increase this value to make the modal wider */
-            max-width: 1000px;  /* Increase this value to set a larger maximum width */
-            border-radius: 10px;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-
         @media screen and (max-width:800px) {
             .content-modal{
                 width: 90%;
             }
         }
 
-
-
-        .row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-
-
-        .image {
-            width: 50px;
-            height: 50px;
-            margin-right: 20px;
-        }
-
-        .btn {
-            background-color: #cae1fd; /* Color del botón */
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
         .avatar5 {
             background-size: 100%;
             background-image: url('https://cdn-icons-png.flaticon.com/256/2100/2100100.png'); /* Ícono del termómetro */
@@ -303,25 +190,6 @@
         .avatar5::before {
             content: '';
         }
-
-        .btn:hover {
-            background-color: #45a049; /* Color al pasar el mouse */
-        }
-        /*----------- CAJA ----------- */
-        .caja {
-            font-family: Century Gothic,CenturyGothic,AppleGothic,sans-serif;
-            color: #ffffff;
-            font-size: 18px;
-            font-weight: 400;
-            text-align: center;
-            background: #588ec9;
-            margin: 0 0 25px;
-            overflow: hidden;
-            padding: 20px;
-            border-radius: 35px 0px 35px 0px;
-            -moz-border-radius: 35px 0px 35px 0px;
-            -webkit-border-radius: 35px 0px 35px 0px;
-            border: 2px solid #588ec9;}
 
         /* Contenedor general para las 4 cards */
         .bienestar-container {
@@ -421,38 +289,6 @@
             cursor: pointer;
         }
 
-        /* Estilo de los Botones debajo del Topbar */
-        .buttons5-container {
-            display: flex;
-            justify-content: flex-start;
-            gap: 10px;
-            padding: 15px 20px;
-            background-color: #f8f9fa; /* Fondo claro */
-        }
-
-        .top-btn {
-            background-color: #ffffff;
-            border: 1px solid #dcdcdc;
-            border-radius: 5px;
-            padding: 10px 20px;
-            font-size: 1rem;
-            color: #333;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .top-btn:hover {
-            background-color: #005f52; /* Color hover similar al topbar */
-            color: #ffffff;
-            border: 1px solid #005f52;
-        }
-
-        .botonActive {
-            background-color: #008775; /* Color hover similar al topbar */
-            color: #ffffff;
-            border: 1px solid #008574;
-        }
-
 
     </style>
 
@@ -463,7 +299,7 @@
 <div id="loader-container"  style="display: flex;flex-direction: column;">
 
     <header>
-        <img src="/logotelecom.jpg" alt="Logo Ingeniería">
+        <a href="/Inicio"><img src="/logotelecom.jpg" alt="Logo Ingeniería"></a>
     </header>
 
 
