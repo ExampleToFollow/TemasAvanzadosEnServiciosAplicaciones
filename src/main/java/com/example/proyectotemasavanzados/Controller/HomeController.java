@@ -17,6 +17,13 @@ public class HomeController {
         this.datoRepository = datoRepository;
     }
 
+    @GetMapping(value="/Home")
+    public String Home(Model model) {
+        List<Dato> listaDatos = datoRepository.findAll();
+        model.addAttribute("listaDatos",listaDatos);
+        return "Home";
+    }
+
     @GetMapping(value="/Inicio/{nombreSalon}")
     public String hola(Model model, @PathVariable(value = "nombreSalon")String nombreSalon) {
         model.addAttribute("nombreSalon",nombreSalon);

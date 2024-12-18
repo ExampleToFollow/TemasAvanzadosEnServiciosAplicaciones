@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec = "http://www.thymeleaf.org/extras/spring-security">    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <link rel="icon" type="image/x-icon" th:href="@{/media/favicon.png}">
+    <script src="https://kit.fontawesome.com/a2dd6045c4.js" crossorigin="anonymous"></script>
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+
+    <link rel="stylesheet" th:href="@{/css/vista1.css}">
+    <link rel="stylesheet" th:href="@{/css/vista.css}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/fonts.css}">
+
+    <link rel="stylesheet" th:href="@{/css/vista2.css}">
+    <link rel="stylesheet" th:href="@{/css/datatables.css}">
+    <link rel="stylesheet" th:href="@{/css/boostrap-datatables.css}">
+    <link rel="stylesheet" th:href="@{/css/aracelli.css}">
+
+
+
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+
+    <!--=============== JAVASCRIPT ===============-->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap5.min.css"/>
+    <!--  Bootstrap-->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.min.css"/>
+    <!--=============== CSS ===============-->
+
+    <title>Monitoreo de temperatura y humedad</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Aptos:wght@700&display=swap');
+    </style>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        .cont {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 20px;
+        }
+        .contai {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        .profile, .mail, .drive, .notes,card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 400ms ease;
+        }
+        .profile:hover, .mail:hover, .drive:hover, .notes:hover, card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            width: 48%; /* Ajustar al 50% con espacio entre las tarjetas */
+            transition: all 400ms ease;
+        }
+        .mail {
+            grid-column: span 2;
+            height: 430px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile {
+            background: linear-gradient(135deg, #e0f7fa 0%, #f1f8e9 100%);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            grid-column: span 1;
+            height: 250px;
+        }
+        .mail {
+            grid-column: span 2;
+        }
+
+        .drive {
+            grid-column: span 2;
+            height: 400px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .notes {
+            grid-column: span 1;
+            height: 397px; /* Ajusta según tus necesidades */
+            margin-top: 2px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 400ms ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .notes:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+        }
+
+        .hygrometer-container {
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Slider estilo */
+        .hygro-slider {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .hygrometer-card {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 260px;
+            margin: auto;
+        }
+
+        svg {
+            display: block;
+            margin: auto;
+        }
+
+        #needle {
+            transform-origin: 110px 110px;
+            transition: transform 0.5s ease;
+        }
+
+
+
+
+        .hygro-info h3 {
+            margin: 0;
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .hygro-info p {
+            margin: 0;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+
+
+        .info {
+            justify-content: center;
+        }
+
+        .info h2 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .info p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #666;
+        }
+        .fw-bold {
+            font-weight: bold;
+        }
+
+        .fw-medium {
+            font-weight: 500;
+        }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 130%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 20% auto;  /* Adjusts the top margin for vertical centering */
+            padding: 50px;
+            border: 1px solid #888;
+            width: 90%;  /* Increase this value to make the modal wider */
+            max-width: 1000px;  /* Increase this value to set a larger maximum width */
+            border-radius: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+
+        @media screen and (max-width:800px) {
+            .content-modal{
+                width: 90%;
+            }
+        }
+
+
+
+        .row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+
+
+        .image {
+            width: 50px;
+            height: 50px;
+            margin-right: 20px;
+        }
+
+        .btn {
+            background-color: #cae1fd; /* Color del botón */
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .avatar5 {
+            background-size: 100%;
+            background-image: url('https://cdn-icons-png.flaticon.com/256/2100/2100100.png'); /* Ícono del termómetro */
+            background-position: center;
+            background-repeat: no-repeat;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            height: 80px;
+            width: 80px;
+            margin-right: 20px;
+        }
+
+        .avatar5::before {
+            content: '';
+        }
+
+        .btn:hover {
+            background-color: #45a049; /* Color al pasar el mouse */
+        }
+        /*----------- CAJA ----------- */
+        .caja {
+            font-family: Century Gothic,CenturyGothic,AppleGothic,sans-serif;
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 400;
+            text-align: center;
+            background: #588ec9;
+            margin: 0 0 25px;
+            overflow: hidden;
+            padding: 20px;
+            border-radius: 35px 0px 35px 0px;
+            -moz-border-radius: 35px 0px 35px 0px;
+            -webkit-border-radius: 35px 0px 35px 0px;
+            border: 2px solid #588ec9;}
+
+        /* Contenedor general para las 4 cards */
+        .bienestar-container {
+            display: flex;
+            flex-direction: column; /* Cards una debajo de otra */
+            justify-content: space-between; /* Espacio entre cards */
+            height: 100%; /* Ocupar el 100% de la altura */
+        }
+
+        .mini-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            height: auto; /* Ajuste automático de altura */
+        }
+
+        /* Avatar personalizado para el ícono */
+        .mini-card .avatar.temperature-icon {
+             /* Color de fondo rojo */
+            background-image: url('https://cdn-icons-png.flaticon.com/256/2100/2100100.png'); /* Ícono del termómetro */
+            background-size: 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            width: 60px;
+            height: 60px;
+            margin-right: 15px;
+        }
+
+        /* Información de la card */
+        .mini-card .info h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .mini-card .info .last-update {
+            margin: 5px 0;
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* Sección de temperatura */
+        .mini-card .temperature {
+            font-size: 24px;
+            font-weight: bold;
+            color: #d32f2f; /* Color rojo */
+        }
+
+        .mini-card .temperature .temp-value {
+            font-family: Arial, sans-serif;
+        }
+        /* Estilo del Topbar */
+        .topbar5 {
+            background-color: #005f52; /* Color de fondo */
+            color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-family: Arial, sans-serif;
+        }
+
+        .topbar5-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .topbar5 .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .topbar5 .logo small {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: normal;
+            color: #e0e0e0;
+        }
+
+        .topbar5-title h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: normal;
+        }
+
+        .topbar5-expand i {
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        /* Estilo de los Botones debajo del Topbar */
+        .buttons5-container {
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+            padding: 15px 20px;
+            background-color: #f8f9fa; /* Fondo claro */
+        }
+
+        .top-btn {
+            background-color: #ffffff;
+            border: 1px solid #dcdcdc;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .top-btn:hover {
+            background-color: #005f52; /* Color hover similar al topbar */
+            color: #ffffff;
+            border: 1px solid #005f52;
+        }
+
+
+    </style>
+
+    <title>Temperatura y Humedad</title>
+</head>
+
+<body >
+<div id="loader-container"  style="display: flex;flex-direction: column;">
+
+    <header>
+        <img src="/logotelecom.jpg" alt="Logo Ingeniería">
+    </header>
+
+
+    <div id="loader-wrapper"  class="loader-wrapper">
+
+        <div class="loader">
+            <div class="roller"></div>
+            <div class="roller"></div>
+        </div>
+
+        <div id="loader2" class="loader">
+            <div class="roller"></div>
+            <div class="roller"></div>
+        </div>
+
+        <div id="loader3" class="loader">
+            <div class="roller"></div>
+            <div class="roller"></div>
+        </div>
+    </div>
+
+</div>
+
+<div id="content-show" class="hidden">
+
+    <!-- Topbar -->
+    <div class="topbar5">
+        <div class="topbar5-content">
+            <div class="logo">
+                <span>IOT<span style="color: #f7931e;">dashboard</span></span>
+                <small>By Elecs Design Pvt. Ltd.</small>
+            </div>
+            <div class="topbar5-title">
+                <h2>Monitoreo de temperatura y humedad</h2>
+            </div>
+            <div class="topbar5-expand">
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones debajo del Topbar -->
+    <div class="buttons5-container">
+        <button class="top-btn">HOME</button>
+        <button class="top-btn">V305</button>
+        <button class="top-btn">V306</button>
+        <button class="top-btn">V307</button>
+    </div>
+
+
+
+    <div ></div>
+
+
+
+
+    <br/>
+    <div class="container">
+        <div class="cont">
+            <div class="bienestar-container">
+                <!-- Card 1 -->
+                <div class="mini-card">
+                    <!-- Icono Avatar (Termómetro) -->
+                    <div class="avatar5 temperature-icon"></div>
+                    <!-- Información de la Card -->
+                    <div class="info">
+                        <h2 class="fw-bold">V305</h2>
+                        <p class="last-update">Last update 9m ago</p>
+                    </div>
+                    <!-- Temperatura -->
+                    <div class="temperature">
+                        <span class="temp-value" id="temperatura-V305">20.9 °C</span>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="mini-card">
+                    <!-- Icono Avatar (Termómetro) -->
+                    <div class="avatar5 temperature-icon"></div>
+                    <!-- Información de la Card -->
+                    <div class="info">
+                        <h2 class="fw-bold">V306</h2>
+                        <p class="last-update">Last update 9m ago</p>
+                    </div>
+                    <!-- Temperatura -->
+                    <div class="temperature">
+                        <span class="temp-value" id="temperatura-V306">20.9 °C</span>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="mini-card">
+                    <!-- Icono Avatar (Termómetro) -->
+                    <div class="avatar5 temperature-icon"></div>
+                    <!-- Información de la Card -->
+                    <div class="info">
+                        <h2 class="fw-bold">V307</h2>
+                        <p class="last-update">Last update 9m ago</p>
+                    </div>
+                    <!-- Temperatura -->
+                    <div class="temperature">
+                        <span class="temp-value" id="temperatura-V307">20.9 °C</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mail">
+                <div class="fw-bold">Temperatura</div>
+                <canvas id="temperatureChart" style="width: 100%; height: 500px;"></canvas>
+            </div>
+            <div class="notes">
+                <h2 style="text-align: center;">Higrómetro de Salones</h2>
+
+                <!-- Slider para cambiar entre salones -->
+                <input type="range" min="1" max="3" value="1" class="hygro-slider" id="hygroSlider">
+                <p id="sliderLabel" style="text-align: center;">Salón: V305</p>
+
+                <!-- Contenedor de las gráficas -->
+                <div class="hygrometer-card" id="hygroCard">
+                    <!-- SVG para la gráfica circular -->
+                    <svg width="680" height="170" id="hygrometer">
+                        <!-- Definir gradientes de color -->
+                        <defs>
+                            <linearGradient id="blueGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#007BFF" />
+                                <stop offset="100%" stop-color="#B3D8FF" />
+                            </linearGradient>
+                            <linearGradient id="redGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#FFB3B3" />
+                                <stop offset="100%" stop-color="#FF0000" />
+                            </linearGradient>
+                        </defs>
+
+                        <!-- Arcos progresivos -->
+                        <path d="M 30,110 A 80,80 0 0,1 110,30" stroke="url(#blueGradient)" stroke-width="18" fill="none" />
+                        <path d="M 110,30 A 80,80 0 0,1 190,110" stroke="url(#redGradient)" stroke-width="18" fill="none" />
+
+                        <!-- Líneas y números de la escala -->
+                        <g stroke="#555" stroke-width="1.5">
+                            <!-- Líneas mayores -->
+                            <line x1="110" y1="15" x2="110" y2="35" />
+                            <line x1="32" y1="110" x2="50" y2="110" />
+                            <line x1="188" y1="110" x2="170" y2="110" />
+                            <!-- Líneas menores -->
+                            <line x1="60" y1="45" x2="68" y2="52" />
+                            <line x1="160" y1="45" x2="152" y2="52" />
+                        </g>
+
+                        <!-- Numeración -->
+                        <text x="45" y="125" font-size="12" fill="#333">0</text>
+                        <text x="100" y="25" font-size="12" fill="#333">48</text>
+                        <text x="175" y="125" font-size="12" fill="#333">88</text>
+
+                        <!-- Aguja dinámica -->
+                        <line x1="110" y1="110" x2="110" y2="40" stroke="red" stroke-width="4" id="needle" />
+                        <circle cx="110" cy="110" r="5" fill="red" />
+
+                        <!-- Valor de humedad -->
+                        <rect x="85" y="150" width="50" height="25" rx="5" fill="#fff" stroke="#ccc" />
+                        <text x="110" y="167" font-size="14" fill="#333" text-anchor="middle" id="humidityValue">46</text>
+                    </svg>
+                </div>
+            </div>
+
+
+
+            <div class="drive">
+                <div class="fw-bold">Humedad</div>
+                <canvas id="humidityChart" style="width: 100%; height: 100%;"></canvas>
+            </div>
+
+        </div>
+    </div>
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content" >
+            <span class="close">&times;</span>
+
+            <table class="display" style="padding-top: 10px">
+                <thead>
+                <tr style="background-color: #378fff">
+                    <th style="text-align: center; color: #ffffff; font-weight: normal !important;">Nombres del paciente</th>
+                    <th style="text-align: center; color: #ffffff; font-weight: normal !important;">Apellidos del paciente</th>
+                    <th style="text-align: center; color: #ffffff; font-weight: normal !important;">Fecha de emisión de la orden</th>
+                    <th style="text-align: center; color: #ffffff; font-weight: normal !important;">Tipo de orden</th>
+                    <th style="text-align: center; color: #ffffff; font-weight: normal !important;">Sede</th>
+                    <th style="text-align: center; color: #ffffff; font-weight: normal !important;">Precio total</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr  >
+                    <td style="text-align: center"  ></td>
+                    <td style="text-align: center"  ></td>
+                    <td style="text-align: center" ></td>
+                    <td style="text-align: center" ></td>
+                    <td style="text-align: center"  th:text="'Web'"></td>
+                    <td style="text-align: center"  th:text="'Pre orden'"></td>
+                    <td style="text-align: center" ></td>
+                    <td style="text-align: center" ></td>
+
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+    <!--Footer -->
+    <br/>
+    <div >
+    </div>
+</div>
+<!-- JQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js" integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<!-- DataTable -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.bootstrap5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.html5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.print.min.js"></script>
+<!-- Bootstrap-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        var table = $('#miTabla, #miTabla2, #miTabla3, #miTabla4, #miTabla5').DataTable({
+            "pageLength": 5,
+            "lengthChange": false,
+            "language": {
+                "emptyTable": "No hay registros disponibles",
+                "zeroRecords": "No se encontraron registros coincidentes",
+                "infoEmpty": "Mostrando 0 a 0 de 0 entradas",
+                "search": "Buscar:",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                },
+                "info": "Mostrando de _START_ a _END_ de _TOTAL_ entradas"
+            },
+            dom: '<"top"fB>rt<"bottom"ip><"clear">',
+            buttons: {
+                dom: {
+                    button: {
+                        className: 'btn-p',
+                        tag: 'button',
+                        style: 'background-color: #689F38'
+                    }
+                },
+                buttons: [
+                    {
+                        extend: "excel",
+                        text: 'Exportar tabla en Excel',
+                        className: 'btn-p',
+                        excelStyles: {
+                            template: 'blue_medium'
+                        },
+                        init: function(api, node, config) {
+                            $(node).css('background-color', '#689F38');
+                        }
+                    }
+                ]
+            },
+            "drawCallback": function(settings) {
+                var api = this.api();
+                var info = api.page.info();
+                if (info.recordsTotal <= 5) {
+                    $(api.table().container()).find('.dataTables_paginate').hide();
+                } else {
+                    $(api.table().container()).find('.dataTables_paginate').show();
+                }
+            }
+        });
+
+        $('#filtroEstado').on('change', function() {
+            var estado = $(this).val();
+            table.column(2).search(estado).draw();
+        });
+
+        $('#limpiarFiltros').on('click', function() {
+            $('#filtroEstado').val('');
+            table.search('').columns().search('').draw();
+        });
+    });
+
+
+</script>
+
+<style>
+    .dataTables_wrapper .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+</style>
+<script>
+    $(document).ready(function() {
+        var opened = false;
+
+        $('#menu-small').hide();
+
+        $('#nav-toggle').click(function (e) {
+            e.stopPropagation();
+            if (opened) {
+                $('#menu-small').hide();
+            } else {
+                $('#menu-small').show();
+            }
+            opened = !opened;
+        });
+    });
+</script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
+
+
+
+<!-- Para usar los botones -->
+<script src="https://cdn.datatables.net/buttons/1.6.5/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.html5.min.js"></script>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('temperatureChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['20:00', '21:00', '22:00', '23:00', '04:00', '08:00', '12:00', '16:00'], // Etiquetas de tiempo
+                datasets: [
+                    {
+                        label: 'Channel 1',
+                        data: [19.5, 20.3, 19.8, 21.1, 20.5, 19.6, 20.2, 20.0], // Datos del canal 1
+                        borderColor: '#4285F4', // Azul
+                        backgroundColor: 'rgba(66, 133, 244, 0.2)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Channel 2',
+                        data: [19.2, 20.1, 18.9, 19.7, 21.0, 19.8, 20.5, 19.6], // Datos del canal 2
+                        borderColor: '#34A853', // Verde
+                        backgroundColor: 'rgba(52, 168, 83, 0.2)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Channel 3',
+                        data: [18.7, 20.0, 19.0, 20.6, 20.1, 21.0, 19.9, 18.7], // Datos del canal 3
+                        borderColor: '#EA4335', // Rojo
+                        backgroundColor: 'rgba(234, 67, 53, 0.2)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Temperature (°C)'
+                        },
+                        min: 18,
+                        max: 22
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('humidityChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['20:00', '21:00', '22:00', '23:00', '04:00', '08:00', '12:00', '16:00'], // Etiquetas de tiempo
+                datasets: [
+                    {
+                        label: 'Channel 1',
+                        data: [50, 47, 40, 35, 38, 42, 65, 55], // Datos de Channel 1
+                        borderColor: '#4285F4',
+                        backgroundColor: 'rgba(66, 133, 244, 0.3)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Channel 2',
+                        data: [48, 45, 38, 36, 39, 43, 60, 52], // Datos de Channel 2
+                        borderColor: '#34A853',
+                        backgroundColor: 'rgba(52, 168, 83, 0.3)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Channel 3',
+                        data: [47, 44, 37, 35, 37, 41, 67, 50], // Datos de Channel 3
+                        borderColor: '#EA4335',
+                        backgroundColor: 'rgba(234, 67, 53, 0.3)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        fill: true,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Humidity (%)'
+                        },
+                        min: 30,
+                        max: 70
+                    }
+                }
+            }
+        });
+    });
+
+
+    const slider = document.getElementById('hygroSlider');
+    const needle = document.getElementById('needle');
+    const humidityValue = document.getElementById('humidityValue');
+    const sliderLabel = document.getElementById('sliderLabel');
+
+    // Valores de humedad por salón
+    const humidityData = {
+        1: { name: "V305", humidity: 20 },
+        2: { name: "V306", humidity: 50 },
+        3: { name: "V307", humidity: 80 },
+    };
+
+    slider.addEventListener('input', () => {
+        const value = slider.value;
+        const data = humidityData[value];
+
+        sliderLabel.textContent = `Salón: ${data.name}`;
+        const angle = (data.humidity / 88) * 180 - 90; // Calcula el ángulo
+        needle.style.transform = `rotate(${angle}deg)`;
+
+        humidityValue.textContent = data.humidity;
+    });
+
+
+
+</script>
+
+
+<script>
+    let datos;
+    let mTemperaturaArea;
+    let bTemperaturaArea;
+    let mHumedadArea;
+    let bHumedadArea;
+    let chartTemperaturaArea;
+    let chartHumedadArea;
+    let tiempoInicialChartTemperaturaArea;
+    let tiempoFinalChartTemperaturaArea;
+    let tiempoInicialChartHumedadArea;
+    let tiempoFinalChartHumedadArea;
+    const DateTime = luxon.DateTime;
+    let timeout;
+    const limiteSinRecibirDatos=20;
+
+    function ejecutarAccionInactividad() {
+        Swal.fire({
+            title: 'No se ha recibido ningún dato hace '+limiteSinRecibirDatos+' segundos',
+            text: 'Es posible que el dispositivo haya perdido conexión a Internet, o no se encuentre en funcionamiento',
+            icon: 'error',
+            confirmButtonText: 'Entendido',
+        });
+        $("#noConexion").show();
+    }
+
+    function reiniciarContadorSinConexion() {
+        $("#noConexion").hide();
+        if (timeout) {
+            clearTimeout(timeout);
+        }
+
+        timeout = setTimeout(ejecutarAccionInactividad, limiteSinRecibirDatos*1000);
+    }
+
+    reiniciarContadorSinConexion();
+
+    function calcularRegresionLineal(expresion) {
+        const datosFiltrados=obtenerDatosFiltrados(expresion);
+        const n = datos.length;
+        let sumaX = 0, sumaY = 0, sumaXY = 0, sumaX2 = 0;
+
+        if(expresion=="Temperatura"){
+            datosFiltrados.forEach((punto) => {
+                const x = new Date(punto.timestamp).getTime();
+                const y = punto.temperatura;
+                sumaX += x;
+                sumaY += y;
+                sumaXY += x * y;
+                sumaX2 += x * x;
+            });
+            mTemperaturaArea = (n * sumaXY - sumaX * sumaY) / (n * sumaX2 - sumaX * sumaX);
+            bTemperaturaArea = (sumaY - mTemperaturaArea * sumaX) / n;
+        }else if(expresion=="Humedad"){
+            datosFiltrados.forEach((punto) => {
+                const x = new Date(punto.timestamp).getTime();
+                const y = punto.humedad;
+                sumaX += x;
+                sumaY += y;
+                sumaXY += x * y;
+                sumaX2 += x * x;
+            });
+            mHumedadArea= (n * sumaXY - sumaX * sumaY) / (n * sumaX2 - sumaX * sumaX);
+            bHumedadArea = (sumaY - mHumedadArea * sumaX) / n;
+        }
+    }
+
+    function generarPuntosRegresion(m,b,datosLocales) {
+        if(datosLocales.length!=0){
+            const xInicio = new Date(datosLocales[0].timestamp).getTime();
+            const xFin = new Date(datosLocales[datosLocales.length - 1].timestamp).getTime();
+            const yInicio = m * xInicio + b;
+            const yFin = m * xFin + b;
+            return [
+                { x: obtenerHoraTimestamp(datosLocales[0].timestamp), y: yInicio },
+                { x: obtenerHoraTimestamp(datosLocales[datosLocales.length - 1].timestamp), y: yFin }
+            ];
+        }else {
+            return {x:0,y:0}
+        }
+    }
+
+
+    function obtenerDatosFiltrados(expresion){
+        if(expresion=="Temperatura"){
+            tiempoInicialChartTemperaturaArea=$("#tiempoInicioGraficoTemperaturaAreas").val();
+            tiempoFinalChartTemperaturaArea=$("#tiempoFinalGraficoTemperaturaAreas").val();
+            if(tiempoInicialChartTemperaturaArea&&tiempoFinalChartTemperaturaArea){
+                return datos.filter(dato => {
+                    const timestamp = new Date(dato.timestamp).getTime();
+                    return timestamp >= new Date(tiempoInicialChartTemperaturaArea).getTime() && timestamp <= new Date(tiempoFinalChartTemperaturaArea).getTime();
+                });
+            }else {
+                return datos;
+            }
+        }else if(expresion=="Humedad"){
+            tiempoInicialChartHumedadArea=$("#tiempoInicioGraficoHumedadAreas").val();
+            tiempoFinalChartHumedadArea=$("#tiempoFinalGraficoHumedadAreas").val();
+            if(tiempoInicialChartHumedadArea&&tiempoFinalChartHumedadArea){
+                return datos.filter(dato => {
+                    const timestamp = new Date(dato.timestamp).getTime();
+                    return timestamp >= new Date(tiempoInicialChartHumedadArea).getTime() && timestamp <= new Date(tiempoFinalChartHumedadArea).getTime();
+                });
+            }else {
+                return datos;
+            }
+        }
+    }
+
+    function recargarGraficoTemperaturaArea(){
+        if(chartTemperaturaArea==null){
+            cargarGraficoTemperaturaArea();
+        }else {
+            const datosLocales=obtenerDatosFiltrados("Temperatura");
+            calcularRegresionLineal("Temperatura");
+            chartTemperaturaArea.updateSeries([{
+                name: 'Temperatura (C°)',
+                data: datosLocales.map(function (dato){
+                    return {x:obtenerHoraTimestamp(dato.timestamp),y:dato.temperatura}
+                })
+            },
+                {
+                    name: `Tendencia ${mTemperaturaArea < 0 ? "(disminuir" : "(aumentar"} ${Math.abs(mTemperaturaArea * 3600000).toFixed(2)} C° cada hora)`,
+                    data: generarPuntosRegresion(mTemperaturaArea,bTemperaturaArea,datosLocales),
+                    type: 'line'
+                }]);
+        }
+    }
+
+    function recargarGraficoHumedadArea(){
+        if(chartHumedadArea==null){
+            cargarGraficoHumedadArea();
+        }else {
+            const datosLocales=obtenerDatosFiltrados("Humedad");
+            calcularRegresionLineal("Humedad");
+            chartHumedadArea.updateSeries([{
+                name: 'Humedad (%)',
+                data: datosLocales.map(function (dato){
+                    return {x:obtenerHoraTimestamp(dato.timestamp),y:dato.humedad}
+                })
+            },
+                {
+                    name: `Tendencia ${mHumedadArea < 0 ? "(disminuir " : "(aumentar "} ${Math.abs(mHumedadArea * 3600000).toFixed(2)}% cada hora)`,
+                    data: generarPuntosRegresion(mHumedadArea,bHumedadArea,datosLocales),
+                    type: 'line'
+                }]);
+        }
+    }
+
+    function cargarGraficoTemperaturaArea(){
+        calcularRegresionLineal("Temperatura");
+        const puntosRegresion = generarPuntosRegresion(mTemperaturaArea, bTemperaturaArea,datos);
+        let tendencia;
+        if(mTemperaturaArea<0){
+            tendencia="Tendencia (disminuir "+(mTemperaturaArea*-3600000).toFixed(2)+" C° cada hora)";
+        }else {
+            tendencia="Tendencia (aumentar "+(mTemperaturaArea*3600000).toFixed(2)+" C° cada hora)";
+        }
+
+        const options = {
+            chart: {
+                type: 'area',
+                height: 350,
+                toolbar: {
+                    show: true
+                }
+            },
+            series: [
+                {
+                    name: 'Temperatura (C°)',
+                    data: datos.map(function (dato){
+                        return {x:obtenerHoraTimestamp(dato.timestamp),y:dato.temperatura}
+                    }),
+                    fill: {
+                        type: 'gradient',
+                        gradient: {
+                            shadeIntensity: 1,
+                            opacityFrom: 0.7,
+                            opacityTo: 0.3
+                        }
+                    }
+                },
+                {
+                    name: tendencia,
+                    data: puntosRegresion,
+                    type: 'line',
+                    stroke: {
+                        curve: 'straight'
+                    },
+                    gradient: {
+                        shadeIntensity: 2,
+                        colorStops: [
+                            {
+                                offset: 0,
+                                color: '#00b894',
+                            },
+                            {
+                                offset: 100,
+                                color: '#00b894',
+                            }
+                        ]
+                    }
+                }],
+            xaxis: {
+                type: 'datetime',
+                title: {
+                    text: 'Tiempo'
+                },
+                labels: {
+                    format: 'HH:mm'
+                }
+            },
+            yaxis: {
+                title: {
+                    text: 'Temperatura (°C)'
+                },
+                decimalsInFloat: 1
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                width: [3, 5]
+            },
+            tooltip: {
+                x: {
+                    format: 'dd MMM HH:mm'
+                }
+            }
+        };
+
+        chartTemperaturaArea = new ApexCharts(document.querySelector("#graficoTemperaturaArea"), options);
+        chartTemperaturaArea.render();
+    }
+
+    function cargarGraficoHumedadArea(){
+        calcularRegresionLineal("Humedad");
+        console.log(datos)
+        const puntosRegresion = generarPuntosRegresion(mHumedadArea, bHumedadArea,datos);
+        let tendencia;
+        if(mHumedadArea<0){
+            tendencia="Tendencia (disminuir "+(mHumedadArea*-3600000).toFixed(2)+"% cada hora)";
+        }else {
+            tendencia="Tendencia (dumentar "+(mHumedadArea*3600000).toFixed(2)+"% cada hora)";
+        }
+
+        const options = {
+            chart: {
+                type: 'area',
+                height: 350,
+                toolbar: {
+                    show: true
+                }
+            },
+            colors: ['#FFA500', '#8B4513'],
+            series: [
+                {
+                    name: 'Humedad (%)',
+                    data: datos.map(function (dato){
+                        console.log(dato.timestamp)
+                        console.log(new Date(dato.timestamp.replace(' ', 'T')).getTime())
+                        return {x:obtenerHoraTimestamp(dato.timestamp),y:dato.humedad}
+                    }),
+                    fill: {
+                        type: 'gradient',
+                        gradient: {
+                            shadeIntensity: 1,
+                            opacityFrom: 0.7,
+                            opacityTo: 0.3
+                        }
+                    }
+                },
+                {
+                    name: tendencia,
+                    data: puntosRegresion,
+                    type: 'line',
+                    stroke: {
+                        curve: 'straight'
+                    },
+                    gradient: {
+                        shadeIntensity: 2,
+                        colorStops: [
+                            {
+                                offset: 0,
+                                color: '#00b894',
+                            },
+                            {
+                                offset: 100,
+                                color: '#00b894',
+                            }
+                        ]
+                    }
+                }],
+            xaxis: {
+                type: 'datetime',
+                title: {
+                    text: 'Tiempo'
+                },
+                labels: {
+                    format: 'HH:mm'
+                }
+            },
+            yaxis: {
+                title: {
+                    text: 'Humedad (%)'
+                },
+                decimalsInFloat: 1
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                width: [3, 5]
+            },
+            tooltip: {
+                x: {
+                    format: 'dd MMM HH:mm'
+                }
+            }
+        };
+
+        chartHumedadArea = new ApexCharts(document.querySelector("#graficoHumedadArea"), options);
+        chartHumedadArea.render();
+    }
+    function obtenerHoraTimestamp(horaDateTime){
+        return DateTime.fromFormat(horaDateTime, 'yyyy-MM-dd HH:mm:ss', { zone: 'UTC' }).toMillis();
+    }
+</script>
+<script>
+    tabla=$("#tableSupreme").DataTable({
+        'paging': true,
+        "pageLength": 10,
+        "language": {
+            "lengthMenu": "Mostrar _MENU_ entradas por página",
+            "zeroRecords": "No se encontraron registros",
+            "infoEmpty": "No hay registros disponibles",
+            "infoFiltered": "(filtrado de _MAX_ total registros)",
+            "search": "Buscar:",
+            "info": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+            emptyTable: "Aún no existe algún dato registrado",
+            "paginate": {
+                "previous": "<",
+                "next": ">",
+            }
+        },
+        'lengthChange': true,
+        'lengthMenu': [  [10, 25, 50, 100, -1]  ,  [10, 25, 50, 100, "Todas"]  ],
+        "buttons": ['pageLength'],
+        'searching': true,
+        'ordering': true,
+        'info': true,
+        'autoWidth': false,
+    });
+
+    let temperatura=null;
+    let humedad=null;
+    /*document.addEventListener('DOMContentLoaded',  ()=>{
+      setInterval(miFuncion, 20000);
+    });*/
+    let ultimoElementoSupreme;
+    function obtenerDatos(){
+        return new Promise((resolve,reject)=>{
+            $.ajax({
+                url: `/datosPorSalon/V305`,
+                method: "GET",
+                success: function (response) {
+                    resolve(response.content);
+                },
+                error: function (xhr, status, error) {
+                    reject(error);
+                }
+            });
+        })
+    }
+
+    async function cargarPagina(){
+        datos=await obtenerDatos();
+        for(let i=0;i<datos.length;i++){
+            agregarFila(datos[i]);
+        }
+        const ultimoDato=datos[datos.length-1];
+        recibirDato(ultimoDato);
+        cargarGraficoTemperaturaArea();
+        cargarGraficoHumedadArea();
+    }
+
+    cargarPagina();
+
+    function cargarDatosPorSalon(salon) {
+        $.ajax({
+            url: `/datosPorSalon/${salon}`,
+            method: "GET",
+            success: function(response) {
+                if (response.status === "success") {
+                    const datos = response.content;
+
+                    tabla.clear();
+
+                    datos.forEach((dato, index) => {
+                        tabla.row.add([
+                            index + 1,
+                            dato.idDispositivo || "N/A",
+                            dato.timestamp,
+                            dato.temperatura,
+                            dato.humedad
+                        ]);
+                    });
+
+                    tabla.draw();
+
+                    actualizarGraficos(datos);
+                }
+            },
+            error: function() {
+                Swal.fire("Error", "No se pudieron cargar los datos del salón", "error");
+            }
+        });
+    }
+
+    function actualizarGraficos(datos) {
+        const temperaturas = datos.map(dato => ({ x: dato.timestamp, y: dato.temperatura }));
+        const humedades = datos.map(dato => ({ x: dato.timestamp, y: dato.humedad }));
+
+        chartTemperaturaArea.updateSeries([{ data: temperaturas }]);
+        chartHumedadArea.updateSeries([{ data: humedades }]);
+    }
+
+
+    function agregarFila(elemento) {
+        tabla.row.add([
+            elemento.id,
+            elemento.idDispositivo,
+            formatDate(elemento.timestamp),
+            elemento.temperatura+"°C",
+            elemento.humedad+"%"
+        ]).draw(false);
+        tabla.order([0, 'desc']).draw();
+    }
+
+    document.querySelectorAll("nav a").forEach(link => {
+        link.addEventListener("click", function(event) {
+            event.preventDefault();
+
+            document.querySelectorAll("nav a").forEach(nav => nav.classList.remove("active"));
+            this.classList.add("active");
+
+            const salon = this.textContent.trim();
+            cargarDatosPorSalon(salon);
+        });
+    });
+
+    const salonActivo = document.querySelector("nav a.active").textContent.trim();
+    cargarDatosPorSalon(salonActivo);
+
+</script>
+<script>
+    let stompClient = null;
+    function connect() {
+        let socket = new SockJS('/message');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function (frame) {
+            stompClient.subscribe('/topic/recibirDato', function (messageOutput) {
+                const nuevoDato=JSON.parse(messageOutput.body);
+                const salonActivo = obtenerSalonActivo();
+
+                if (nuevoDato.salon.nombre === salonActivo) {
+                    recibirDato(nuevoDato);
+                    agregarFila(nuevoDato);
+                    datos.push(nuevoDato);
+                    recargarGraficoTemperaturaArea()
+                    recargarGraficoHumedadArea()
+                    reiniciarContadorSinConexion();
+                }
+            });
+        });
+    }
+
+    function obtenerSalonActivo() {
+        return document.querySelector("nav a.active").textContent.trim();
+    }
+
+    function formatDate(datetime) {
+        const [datePart, timePart] = datetime.split(' ');
+        const [year, month, day] = datePart.split('-');
+        const [hours, minutes, seconds] = timePart.split(':');
+        return `${day}/${month}/${year.slice(-2)} - ${hours}:${minutes}:${seconds}`;
+    }
+
+    function recibirDato(dato){
+        const temperaturaRecibida=dato.temperatura;
+        const humedadRecibida=dato.humedad;
+        const elementoHumedad=$("#humedad");
+        const elementoHora=$("#hora");
+
+        const elementoTemperatura = document.querySelector(`#temperatura-${salon}`);
+        if (elementoTemperatura) {
+            if (temperaturaRecibida > 30) {
+                elementoTemperatura.textContent = temperaturaRecibida + "°C";
+            } else if (temperaturaRecibida > 24) {
+                elementoTemperatura.textContent = temperaturaRecibida + "°C";
+            } else if (temperaturaRecibida > 18) {
+                elementoTemperatura.textContent = temperaturaRecibida + "°C";
+            } else {
+                elementoTemperatura.textContent = temperaturaRecibida + "°C";
+            }
+        }
+
+        if(humedadRecibida>80){
+            elementoHumedad.text(humedadRecibida+"%");
+        }else if(humedadRecibida>70){
+            elementoHumedad.text(humedadRecibida+"%");
+        }else if(humedadRecibida>40){
+            elementoHumedad.text(humedadRecibida+"%");
+        }else{
+            elementoHumedad.text(humedadRecibida+"%");
+        }
+
+        elementoHora.text("Muestra tomada el: "+formatDate(dato.timestamp));
+
+    }
+    connect();
+</script>
+
+</body>
+</html>
