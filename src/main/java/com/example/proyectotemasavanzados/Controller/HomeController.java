@@ -19,8 +19,6 @@ public class HomeController {
 
     @GetMapping(value="/Inicio/{nombreSalon}")
     public String hola(Model model, @PathVariable(value = "nombreSalon")String nombreSalon) {
-        List<Dato> listaDatos = datoRepository.findAll();
-        model.addAttribute("listaDatos",listaDatos);
         model.addAttribute("nombreSalon",nombreSalon);
         if(!nombreSalon.equals("V305")&&!nombreSalon.equals("V306")&&!nombreSalon.equals("V307")){
             return "redirect:/Inicio/V305";

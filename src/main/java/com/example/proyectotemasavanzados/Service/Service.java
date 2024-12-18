@@ -68,8 +68,8 @@ public class Service {
     }
 
     @GetMapping("/datosPorSalon/{salon}")
-    public ResponseEntity<HashMap<String, Object>> obtenerDatosPorSalon(@PathVariable String salon) {
-        List<Dato> datosFiltrados = datoRepository.findBySalonNombre(salon);
+    public ResponseEntity<HashMap<String, Object>> obtenerDatosPorSalon(@PathVariable(value = "salon") String salon) {
+        List<Dato> datosFiltrados = datoRepository.listarDatosPorSalon(salon);
         HashMap<String, Object> response = new HashMap<>();
         response.put("content", datosFiltrados);
         response.put("status", "success");
