@@ -17,7 +17,7 @@ public class HomeController {
         this.datoRepository = datoRepository;
     }
 
-    @GetMapping(value="/Home")
+    @GetMapping(value={"/Inicio","/Inicio/"})
     public String Home(Model model) {
         List<Dato> listaDatos = datoRepository.findAll();
         model.addAttribute("listaDatos",listaDatos);
@@ -26,10 +26,10 @@ public class HomeController {
 
     @GetMapping(value="/Inicio/{nombreSalon}")
     public String hola(Model model, @PathVariable(value = "nombreSalon")String nombreSalon) {
-        model.addAttribute("nombreSalon",nombreSalon);
-        if(!nombreSalon.equals("V305")&&!nombreSalon.equals("V306")&&!nombreSalon.equals("V307")){
+        model.addAttribute("nombreSalon", nombreSalon);
+        if (!nombreSalon.equals("V305") && !nombreSalon.equals("V306") && !nombreSalon.equals("V307")) {
             return "redirect:/Inicio/V305";
-        }else {
+        } else {
             return "Inicio";
         }
     }

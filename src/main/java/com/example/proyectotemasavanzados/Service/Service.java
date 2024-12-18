@@ -32,20 +32,20 @@ public class Service {
     @PostMapping("/registrarDato")
     public ResponseEntity<HashMap<String, Object>> registrarDato(@RequestBody Map<String, Object> body) {
         List<Map<String,Object>> lista = (List<Map<String, Object>>) body.get("lista");
-        for(Map<String,Object> elemento: lista){
-            String temperatura=(String) elemento.get("Temperatura");
-            temperatura=temperatura.split("°")[0];
-            String humedad=(String) elemento.get("Humedad");
-            String idDevice =  "12";
-            String timestamp=(String) elemento.get("Timestamp");
-            String salon=(String) elemento.get("Salon");
-            String password=(String) elemento.get("Password");
-            Integer idSalon=salonRepository.verificarIdSalon(salon,password);
-            if(idSalon!=null){
+        for(Map<String,Object> elemento: lista) {
+            String temperatura = (String) elemento.get("Temperatura");
+            temperatura = temperatura.split("°")[0];
+            String humedad = (String) elemento.get("Humedad");
+            String idDevice = "12";
+            String timestamp = (String) elemento.get("Timestamp");
+            String salon = (String) elemento.get("Salon");
+            String password = (String) elemento.get("Password");
+            Integer idSalon = salonRepository.verificarIdSalon(salon, password);
+            if (idSalon != null) {
                 Dato dato = new Dato();
-                if(timestamp==null){
+                if (timestamp == null) {
                     dato.setTimestamp(ZonedDateTime.now(ZoneId.of("America/Lima")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-                }else {
+                } else {
                     dato.setTimestamp(timestamp);
                 }
                 dato.setSalon(salonRepository.findById(idSalon).get());
@@ -53,15 +53,14 @@ public class Service {
                 dato.setTemperatura(new BigDecimal(temperatura));
                 dato.setHumedad(new BigDecimal(humedad));
                 datoRepository.save(dato);
-                HashMap<String,Object> ola = new HashMap<>();
-                ola.put("dato",dato);
-                ola.put("salon",salon);
-                simpMessagingTemplate.convertAndSend("/topic/recibirDato",ola);
+                HashMap<String, Object> ola = new HashMap<>();
+                ola.put("dato", dato);
+                ola.put("salon", salon);
+                simpMessagingTemplate.convertAndSend("/topic/recibirDato", ola);
             }
         }
         return null;
     }
-
 
     @GetMapping("/obtenerDatos")
     public ResponseEntity<HashMap<String,Object>> obtenerDatos(){

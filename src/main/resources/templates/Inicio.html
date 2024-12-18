@@ -208,21 +208,79 @@
         <div id="graficoHumedadArea"></div>
       </div>
     </div>
-    <div style="height: 100px;width: 100%"></div>
     <div class="row">
       <div class="col-lg-6">
-        <div style="width: 100%;display: flex; justify-content: space-around">
-          <span>Rangos: </span>
-          <input type="time" disabled value="00:00">
-          <input type="time" id="a">
-          <input type="time" id="b">
-          <input type="time" id="c">
-          <input type="time" disabled value="23:59">
-        </div>
         <div class="row">
+          <div class="time-range-selector" style="display: flex;align-items: center">
+            <span style="font-weight: bolder;font-size: 150%">Promedios de temperatura por día</span>
+            <label for="tiempoInicioGraficoTemperaturaBarras">Inicio:</label>
+            <input type="datetime-local" id="tiempoInicioGraficoTemperaturaBarras">
 
+            <label for="tiempoFinalGraficoTemperaturaBarras">Fin:</label>
+            <input type="datetime-local" id="tiempoFinalGraficoTemperaturaBarras">
+
+            <button class="apply-button" onclick="recargarGraficoTemperaturaBarra()">Aplicar</button>
+          </div>
+          <span style="font-weight: bold">Rangos: </span>
+          <div class="col-6" style="display: flex;justify-content: space-around">
+            <span>Noche (1): </span>
+            <input style="width: fit-content" class="form-control" type="time" disabled value="00:00">
+            <input onchange="aux()" style="width: fit-content" class="form-control" type="time" value="06:00" id="a_1-temperatura">
+          </div>
+          <div class="col-6" style="display: flex;justify-content: space-around">
+            <span>Mañana: </span>
+            <input style="width: fit-content" class="form-control" value="06:00" type="time" id="a_2-temperatura">
+            <input style="width: fit-content" class="form-control" value="12:00" type="time" id="b_1-temperatura">
+          </div>
+          <div class="col-6" style="display: flex;justify-content: space-around">
+            <span>Tarde: </span>
+            <input style="width: fit-content" class="form-control" value="12:00" type="time" id="b_2-temperatura">
+            <input style="width: fit-content" class="form-control" value="18:00" type="time" id="c_1-temperatura">
+          </div>
+          <div class="col-6" style="display: flex;justify-content: space-around">
+            <span>Noche (2): </span>
+            <input style="width: fit-content" class="form-control" value="18:00" type="time" id="c_2-temperatura">
+            <input style="width: fit-content" class="form-control" type="time" disabled value="23:59">
+          </div>
         </div>
         <div id="graficoTemperaturaPromedios"></div>
+        <br>
+      </div>
+      <div class="col-lg-6">
+        <div class="row">
+          <div class="time-range-selector" style="display: flex;align-items: center">
+            <span style="font-weight: bolder;font-size: 150%">Promedios de temperatura por día</span>
+            <label for="tiempoInicioGraficoHumedadBarras">Inicio:</label>
+            <input type="datetime-local" id="tiempoInicioGraficoHumedadBarras">
+
+            <label for="tiempoFinalGraficoHumedadBarras">Fin:</label>
+            <input type="datetime-local" id="tiempoFinalGraficoHumedadBarras">
+
+            <button class="apply-button" onclick="recargarGraficoHumedadBarra()">Aplicar</button>
+          </div>
+          <span style="font-weight: bold">Rangos: </span>
+          <div class="col-6" style="display: flex;justify-content: space-around">
+            <span>Noche (1): </span>
+            <input style="width: fit-content" class="form-control" type="time" disabled value="00:00">
+            <input style="width: fit-content" class="form-control" type="time" value="06:00" id="a_1-humedad">
+          </div>
+          <div class="col-6" style="display: flex;justify-content: space-around">
+            <span>Mañana: </span>
+            <input style="width: fit-content" class="form-control" value="06:00" type="time" id="a_2-humedad">
+            <input style="width: fit-content" class="form-control" value="12:00" type="time" id="b_1-humedad">
+          </div>
+          <div class="col-6" style="display: flex;justify-content: space-around">
+            <span>Tarde: </span>
+            <input style="width: fit-content" class="form-control" value="12:00" type="time" id="b_2-humedad">
+            <input style="width: fit-content" class="form-control" value="18:00" type="time" id="c_1-humedad">
+          </div>
+          <div class="col-6" style="display: flex;justify-content: space-around">
+            <span>Noche (2): </span>
+            <input style="width: fit-content" class="form-control" value="18:00" type="time" id="c_2-humedad">
+            <input style="width: fit-content" class="form-control" type="time" disabled value="23:59">
+          </div>
+        </div>
+        <div id="graficoHumedadPromedios"></div>
         <br>
       </div>
     </div>
@@ -272,6 +330,8 @@
     let timeout;
     const limiteSinRecibirDatos=20;
 
+    let chartTemperaturaBarra;
+    let chartHumedadBarra;
 
     // Función para obtener la fecha y hora actual en formato 'YYYY-MM-DDTHH:MM'
     function obtenerFechaActual() {
@@ -380,6 +440,32 @@
       }else if(expresion=="Humedad"){
         tiempoInicialChartHumedadArea=$("#tiempoInicioGraficoHumedadAreas").val();
         tiempoFinalChartHumedadArea=$("#tiempoFinalGraficoHumedadAreas").val();
+        if(tiempoInicialChartHumedadArea&&tiempoFinalChartHumedadArea){
+          return datos.filter(dato => {
+            const timestamp = new Date(dato.timestamp).getTime();
+            return timestamp >= new Date(tiempoInicialChartHumedadArea).getTime() && timestamp <= new Date(tiempoFinalChartHumedadArea).getTime();
+          });
+        }else {
+          return datos;
+        }
+      }
+    }
+
+    function obtenerDatosFiltradosBarra(expresion){
+      if(expresion=="Temperatura"){
+        tiempoInicialChartTemperaturaArea=$("#tiempoInicioGraficoTemperaturaBarras").val();
+        tiempoFinalChartTemperaturaArea=$("#tiempoFinalGraficoTemperaturaBarras").val();
+        if(tiempoInicialChartTemperaturaArea&&tiempoFinalChartTemperaturaArea){
+          return datos.filter(dato => {
+            const timestamp = new Date(dato.timestamp).getTime();
+            return timestamp >= new Date(tiempoInicialChartTemperaturaArea).getTime() && timestamp <= new Date(tiempoFinalChartTemperaturaArea).getTime();
+          });
+        }else {
+          return datos;
+        }
+      }else if(expresion=="Humedad"){
+        tiempoInicialChartHumedadArea=$("#tiempoInicioGraficoHumedadBarras").val();
+        tiempoFinalChartHumedadArea=$("#tiempoFinalGraficoHumedadBarras").val();
         if(tiempoInicialChartHumedadArea&&tiempoFinalChartHumedadArea){
           return datos.filter(dato => {
             const timestamp = new Date(dato.timestamp).getTime();
@@ -522,6 +608,38 @@
 
       chartTemperaturaArea = new ApexCharts(document.querySelector("#graficoTemperaturaArea"), options);
       chartTemperaturaArea.render();
+    }
+
+    function aux(){
+      console.log(this)
+    }
+
+    function validarRangoCorrectoTemperatura() {
+      const a1=$("#a_1-temperatura").val();
+      const a2=$("#a_2-temperatura").val();
+      const b1=$("#b_1-temperatura").val();
+      const b2=$("#b_2-temperatura").val();
+      const c1=$("#c_1-temperatura").val();
+      const c2=$("#c_2-temperatura").val();
+      if(a1!=a2||b1!=b2||c1!=c2||a1>b1||b1>c1){
+        return false;
+      }else {
+        return true;
+      }
+    }
+
+    function validarRangoCorrectoHumedad() {
+      const a1=$("#a_1-humedad").val();
+      const a2=$("#a_2-humedad").val();
+      const b1=$("#b_1-humedad").val();
+      const b2=$("#b_2-humedad").val();
+      const c1=$("#c_1-humedad").val();
+      const c2=$("#c_2-humedad").val();
+      if(a1!=a2||b1!=b2||c1!=c2||a1>b1||b1>c1){
+        return false;
+      }else {
+        return true;
+      }
     }
 
     function cargarGraficoHumedadArea(){
@@ -678,12 +796,8 @@
       recargarGraficoTemperaturaArea()
       recargarGraficoHumedadArea()
       // Ejemplo de uso:
-
-      const rangoManana = { a: 6, b: 12 }; // 6:00 a 12:00
-      const rangoTarde = { b: 12, c: 18 }; // 12:00 a 18:00
-
-      const promedios = procesarDatos(datos, rangoManana, rangoTarde);
-      generarGrafica(promedios);
+      recargarGraficoTemperaturaBarra();
+      recargarGraficoHumedadBarra()
     }
     cargarPagina();
 
@@ -865,8 +979,18 @@
       return suma / arreglo.length;
     }
 
-    // Función para generar la gráfica con ApexCharts
-    function generarGrafica(promedios) {
+    function recargarGraficoTemperaturaBarra() {
+
+      const a=$("#a_1-temperatura").val();
+      const b=$("#b_1-temperatura").val();
+      const c=$("#c_1-temperatura").val();
+
+      const rangoManana = { a: a, b: b }; // 6:00 a 12:00
+      const rangoTarde = { b: b, c: c }; // 12:00 a 18:00
+
+      const datosFiltrados = obtenerDatosFiltradosBarra("Temperatura");
+      const promedios = procesarDatos(datosFiltrados, rangoManana, rangoTarde);
+
       const categorias = promedios.map((p) => p.dia); // Días en el eje X
       const dataManana = promedios.map((p) => p.manana);
       const dataTarde = promedios.map((p) => p.tarde);
@@ -878,49 +1002,115 @@
           { name: 'Tarde', data: dataTarde },
           { name: 'Noche', data: dataNoche },
         ],
-        chart: {
-          type: 'bar',
-          height: 350,
-        },
-        plotOptions: {
-          bar: {
-            horizontal: false,
-            columnWidth: '55%',
-            borderRadius: 5,
-            borderRadiusApplication: 'end',
-          },
-        },
-        dataLabels: {
-          enabled: false,
-        },
-        stroke: {
-          show: true,
-          width: 2,
-          colors: ['transparent'],
-        },
         xaxis: {
           categories: categorias,
         },
-        yaxis: {
-          title: {
-            text: 'Temperatura (°C)'
-          },
-          decimalsInFloat: 1
-        },
-        fill: {
-          opacity: 1,
-        },
-        tooltip: {
-          y: {
-            formatter: function (val) {
-              return val.toFixed(2) + ' °C';
+      };
+
+      // Si la gráfica ya existe, actualiza los datos
+      if (chartTemperaturaBarra) {
+        chartTemperaturaBarra.updateOptions(options);
+      } else {
+        // Si no existe, inicializa la gráfica
+        chartTemperaturaBarra = new ApexCharts(document.querySelector("#graficoTemperaturaPromedios"), {
+          ...options,
+          chart: { type: 'bar', height: 350 },
+          plotOptions: {
+            bar: {
+              horizontal: false,
+              columnWidth: '55%',
+              borderRadius: 5,
+              borderRadiusApplication: 'end',
             },
           },
+          dataLabels: { enabled: false },
+          stroke: {
+            show: true,
+            width: 2,
+            colors: ['transparent'],
+          },
+          yaxis: {
+            title: { text: 'Temperatura (°C)' },
+            decimalsInFloat: 1,
+          },
+          fill: { opacity: 1 },
+          tooltip: {
+            y: {
+              formatter: function (val) {
+                return val.toFixed(2) + ' °C';
+              },
+            },
+          },
+        });
+        chartTemperaturaBarra.render();
+      }
+    }
+
+    function recargarGraficoHumedadBarra() {
+
+      const a=$("#a_1-humedad").val();
+      const b=$("#b_1-humedad").val();
+      const c=$("#c_1-humedad").val();
+
+      const rangoManana = { a: a, b: b }; // 6:00 a 12:00
+      const rangoTarde = { b: b, c: c }; // 12:00 a 18:00
+
+      const datosFiltrados = obtenerDatosFiltradosBarra("Humedad");
+      const promedios = procesarDatos(datosFiltrados, rangoManana, rangoTarde);
+
+      const categorias = promedios.map((p) => p.dia); // Días en el eje X
+      const dataManana = promedios.map((p) => p.manana);
+      const dataTarde = promedios.map((p) => p.tarde);
+      const dataNoche = promedios.map((p) => p.noche);
+
+      const options = {
+        series: [
+          { name: 'Mañana', data: dataManana },
+          { name: 'Tarde', data: dataTarde },
+          { name: 'Noche', data: dataNoche },
+        ],
+        xaxis: {
+          categories: categorias,
         },
       };
 
-      const chart = new ApexCharts(document.querySelector("#graficoTemperaturaPromedios"), options);
-      chart.render();
+      // Si la gráfica ya existe, actualiza los datos
+      if (chartHumedadBarra) {
+        chartHumedadBarra.updateOptions(options);
+      } else {
+        // Si no existe, inicializa la gráfica
+        chartHumedadBarra = new ApexCharts(document.querySelector("#graficoHumedadPromedios"), {
+          ...options,
+          chart: { type: 'bar', height: 350 },
+          plotOptions: {
+            bar: {
+              horizontal: false,
+              columnWidth: '55%',
+              borderRadius: 5,
+              borderRadiusApplication: 'end',
+            },
+          },
+          dataLabels: { enabled: false },
+          stroke: {
+            show: true,
+            width: 2,
+            colors: ['transparent'],
+          },
+          yaxis: {
+            title: { text: 'Humedad (%)' },
+            decimalsInFloat: 1,
+          },
+          fill: { opacity: 1 },
+          tooltip: {
+            y: {
+              formatter: function (val) {
+                return val.toFixed(2) + ' %';
+              },
+            },
+          },
+        });
+        chartHumedadBarra.render();
+      }
     }
 
 

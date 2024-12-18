@@ -447,6 +447,12 @@
             border: 1px solid #005f52;
         }
 
+        .botonActive {
+            background-color: #008775; /* Color hover similar al topbar */
+            color: #ffffff;
+            border: 1px solid #008574;
+        }
+
 
     </style>
 
@@ -488,7 +494,7 @@
         <div class="topbar5-content">
             <div class="logo">
                 <span>IOT<span style="color: #f7931e;">dashboard</span></span>
-                <small>By Elecs Design Pvt. Ltd.</small>
+                <small>By Niurka y sus amigos.</small>
             </div>
             <div class="topbar5-title">
                 <h2>Monitoreo de temperatura y humedad</h2>
@@ -499,17 +505,18 @@
         </div>
     </div>
 
-    <!-- Botones debajo del Topbar -->
-    <div class="buttons5-container">
-        <button class="top-btn">HOME</button>
-        <button class="top-btn">V305</button>
-        <button class="top-btn">V306</button>
-        <button class="top-btn">V307</button>
-    </div>
+    <nav>
+        <a href="/Inicio/V305"
+           th:classappend="${nombreSalon == 'V305'} ? 'active' : ''">V305</a>
+        <a href="/Inicio/V306"
+           th:classappend="${nombreSalon == 'V306'} ? 'active' : ''">V306</a>
+        <a href="/Inicio/V307"
+           th:classappend="${nombreSalon == 'V307'} ? 'active' : ''">V307</a>
+    </nav>
 
 
 
-    <div ></div>
+    <div></div>
 
 
 
@@ -630,45 +637,6 @@
 
         </div>
     </div>
-    <!-- Modal -->
-    <div id="myModal" class="modal">
-        <div class="modal-content" >
-            <span class="close">&times;</span>
-
-            <table class="display" style="padding-top: 10px">
-                <thead>
-                <tr style="background-color: #378fff">
-                    <th style="text-align: center; color: #ffffff; font-weight: normal !important;">Nombres del paciente</th>
-                    <th style="text-align: center; color: #ffffff; font-weight: normal !important;">Apellidos del paciente</th>
-                    <th style="text-align: center; color: #ffffff; font-weight: normal !important;">Fecha de emisión de la orden</th>
-                    <th style="text-align: center; color: #ffffff; font-weight: normal !important;">Tipo de orden</th>
-                    <th style="text-align: center; color: #ffffff; font-weight: normal !important;">Sede</th>
-                    <th style="text-align: center; color: #ffffff; font-weight: normal !important;">Precio total</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr  >
-                    <td style="text-align: center"  ></td>
-                    <td style="text-align: center"  ></td>
-                    <td style="text-align: center" ></td>
-                    <td style="text-align: center" ></td>
-                    <td style="text-align: center"  th:text="'Web'"></td>
-                    <td style="text-align: center"  th:text="'Pre orden'"></td>
-                    <td style="text-align: center" ></td>
-                    <td style="text-align: center" ></td>
-
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-
-
-    <!--Footer -->
-    <br/>
-    <div >
-    </div>
 </div>
 <!-- JQuery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js" integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -786,6 +754,14 @@
 
 <!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const ctx = document.getElementById('temperatureChart').getContext('2d');
@@ -951,11 +927,6 @@
     });
 
 
-
-</script>
-
-
-<script>
     let datos;
     let mTemperaturaArea;
     let bTemperaturaArea;
@@ -1186,8 +1157,8 @@
             }
         };
 
-        chartTemperaturaArea = new ApexCharts(document.querySelector("#graficoTemperaturaArea"), options);
-        chartTemperaturaArea.render();
+        //chartTemperaturaArea = new ApexCharts(document.querySelector("#graficoTemperaturaArea"), options);
+        //chartTemperaturaArea.render();
     }
 
     function cargarGraficoHumedadArea(){
@@ -1276,8 +1247,8 @@
             }
         };
 
-        chartHumedadArea = new ApexCharts(document.querySelector("#graficoHumedadArea"), options);
-        chartHumedadArea.render();
+        //chartHumedadArea = new ApexCharts(document.querySelector("#graficoHumedadArea"), options);
+        //chartHumedadArea.render();
     }
     function obtenerHoraTimestamp(horaDateTime){
         return DateTime.fromFormat(horaDateTime, 'yyyy-MM-dd HH:mm:ss', { zone: 'UTC' }).toMillis();
@@ -1394,20 +1365,7 @@
         tabla.order([0, 'desc']).draw();
     }
 
-    document.querySelectorAll("nav a").forEach(link => {
-        link.addEventListener("click", function(event) {
-            event.preventDefault();
 
-            document.querySelectorAll("nav a").forEach(nav => nav.classList.remove("active"));
-            this.classList.add("active");
-
-            const salon = this.textContent.trim();
-            cargarDatosPorSalon(salon);
-        });
-    });
-
-    const salonActivo = document.querySelector("nav a.active").textContent.trim();
-    cargarDatosPorSalon(salonActivo);
 
 </script>
 <script>
@@ -1418,23 +1376,18 @@
         stompClient.connect({}, function (frame) {
             stompClient.subscribe('/topic/recibirDato', function (messageOutput) {
                 const nuevoDato=JSON.parse(messageOutput.body);
-                const salonActivo = obtenerSalonActivo();
 
-                if (nuevoDato.salon.nombre === salonActivo) {
-                    recibirDato(nuevoDato);
-                    agregarFila(nuevoDato);
-                    datos.push(nuevoDato);
-                    recargarGraficoTemperaturaArea()
-                    recargarGraficoHumedadArea()
-                    reiniciarContadorSinConexion();
-                }
+                recibirDato(nuevoDato);
+                agregarFila(nuevoDato);
+                datos.push(nuevoDato);
+                recargarGraficoTemperaturaArea()
+                recargarGraficoHumedadArea()
+                reiniciarContadorSinConexion();
             });
         });
     }
 
-    function obtenerSalonActivo() {
-        return document.querySelector("nav a.active").textContent.trim();
-    }
+
 
     function formatDate(datetime) {
         const [datePart, timePart] = datetime.split(' ');
@@ -1449,8 +1402,8 @@
         const elementoHumedad=$("#humedad");
         const elementoHora=$("#hora");
 
-        const elementoTemperatura = document.querySelector(`#temperatura-${salon}`);
-        if (elementoTemperatura) {
+        // elementoTemperatura = document.querySelector(`#temperatura-${salon}`);
+        /*if (elementoTemperatura) {
             if (temperaturaRecibida > 30) {
                 elementoTemperatura.textContent = temperaturaRecibida + "°C";
             } else if (temperaturaRecibida > 24) {
@@ -1460,8 +1413,8 @@
             } else {
                 elementoTemperatura.textContent = temperaturaRecibida + "°C";
             }
-        }
-
+        }*/
+        /*
         if(humedadRecibida>80){
             elementoHumedad.text(humedadRecibida+"%");
         }else if(humedadRecibida>70){
@@ -1473,7 +1426,7 @@
         }
 
         elementoHora.text("Muestra tomada el: "+formatDate(dato.timestamp));
-
+        */
     }
     connect();
 </script>
