@@ -17,7 +17,6 @@ public class Dato implements Serializable {
 
     @ManyToOne(optional = false,fetch = FetchType.EAGER)
     @JoinColumn(name = "id_salon", nullable = false)
-    @JsonIgnore
     private Salon salon;
 
     @Column(name = "id_dispositivo", nullable = false, length = 1000)

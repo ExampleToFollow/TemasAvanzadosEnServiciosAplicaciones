@@ -368,7 +368,7 @@
                     <!-- Información de la Card -->
                     <div class="info">
                         <h2 class="fw-bold">V305</h2>
-                        <p class="last-update">Last update 9m ago</p>
+                        <p id="ultimaActualizacion-V305" class="last-update">Última actualización hace 9 min</p>
                     </div>
                     <!-- Temperatura -->
                     <div class="temperature">
@@ -383,7 +383,7 @@
                     <!-- Información de la Card -->
                     <div class="info">
                         <h2 class="fw-bold">V306</h2>
-                        <p class="last-update">Last update 9m ago</p>
+                        <p id="ultimaActualizacion-V306" class="last-update">Última actualización hace 9 min</p>
                     </div>
                     <!-- Temperatura -->
                     <div class="temperature">
@@ -398,7 +398,7 @@
                     <!-- Información de la Card -->
                     <div class="info">
                         <h2 class="fw-bold">V307</h2>
-                        <p class="last-update">Last update 9m ago</p>
+                        <p id="ultimaActualizacion-V307" class="last-update">Última actualización hace 9 min</p>
                     </div>
                     <!-- Temperatura -->
                     <div class="temperature">
@@ -992,7 +992,7 @@
     function obtenerDatos(){
         return new Promise((resolve,reject)=>{
             $.ajax({
-                url: `/datosPorSalon/V305`,
+                url: `/obtenerDatos`,
                 method: "GET",
                 success: function (response) {
                     resolve(response.content);
@@ -1006,13 +1006,64 @@
 
     async function cargarPagina(){
         datos=await obtenerDatos();
+        let ultimoDatoV305;
+        let ultimoDatoV306;
+        let ultimoDatoV307;
+        let ultimosDatosV305=[];
+        let ultimosDatosV306=[];
+        let ultimosDatosV307=[];
+        let contadorV305=0;
+        let contadorV306=0;
+        let contadorV307=0;
+        let contadorLimite=10;
         for(let i=0;i<datos.length;i++){
-            agregarFila(datos[i]);
+            const dato=datos[i];
+            console.log(dato)
+            agregarFila(dato);
+            if(dato.salon.nombre=="V305"){
+                if(contadorV305<contadorLimite){
+                    ultimosDatosV305.push(dato);
+                    contadorV305++;
+                }
+                if(!ultimoDatoV305){
+                    ultimoDatoV305=dato;
+
+                }
+            }
+            if(dato.salon.nombre=="V306"){
+                if(contadorV306<contadorLimite){
+                    ultimosDatosV306.push(dato);
+                    contadorV306++;
+                }
+                if(!ultimoDatoV306){
+                    ultimoDatoV306=dato;
+
+                }
+            }
+            if(dato.salon.nombre=="V307"){
+                if(contadorV307<contadorLimite){
+                    ultimosDatosV307.push(dato);
+                    contadorV307++;
+                }
+                if(!ultimoDatoV307){
+                    ultimoDatoV307=dato;
+
+                }
+            }
         }
-        const ultimoDato=datos[datos.length-1];
-        recibirDato(ultimoDato);
+        console.log(ultimosDatosV305,ultimosDatosV306,ultimosDatosV307)
+        $("#temperatura-V305").text(ultimoDatoV305.temperatura+" °C");
+        $("#ultimaActualizacion-V305").text("Última actualización "+tiempoTranscurrido(ultimoDatoV305.timestamp));
+        $("#temperatura-V306").text(ultimoDatoV306.temperatura+" °C");
+        $("#ultimaActualizacion-V306").text("Última actualización "+tiempoTranscurrido(ultimoDatoV306.timestamp));
+        $("#temperatura-V307").text(ultimoDatoV307.temperatura+" °C");
+        $("#ultimaActualizacion-V307").text("Última actualización "+tiempoTranscurrido(ultimoDatoV307.timestamp));
+
         cargarGraficoTemperaturaArea();
         cargarGraficoHumedadArea();
+        inicializarGraficaTemperatura(ultimosDatosV305,ultimosDatosV306,ultimosDatosV307);
+        inicializarGraficaHumedad(ultimosDatosV305,ultimosDatosV306,ultimosDatosV307);
+
     }
 
     cargarPagina();
@@ -1069,9 +1120,29 @@
     }
 
 
+    function tiempoTranscurrido(fechaHora) {
+        // Convertir la fechaHora al formato adecuado para Date
+        const fechaDada = new Date(fechaHora.replace(" ", "T"));
+        const ahora = new Date();
 
-</script>
-<script>
+        // Calcular la diferencia en milisegundos
+        const diferenciaMs = ahora - fechaDada;
+
+        // Convertir la diferencia a segundos, minutos y horas
+        const segundos = Math.floor(diferenciaMs / 1000);
+        const minutos = Math.floor(segundos / 60);
+        const horas = Math.floor(minutos / 60);
+
+        // Devolver el formato adecuado
+        if (horas >= 1) {
+            return `hace ${horas} ${horas === 1 ? "hora" : "horas"}`;
+        } else if (minutos >= 1) {
+            return `hace ${minutos} ${minutos === 1 ? "minuto" : "minutos"}`;
+        } else {
+            return `hace ${segundos} ${segundos === 1 ? "segundo" : "segundos"}`;
+        }
+    }
+
     let stompClient = null;
     let humedad305;
     let humedad306;
@@ -1079,9 +1150,87 @@
     let temperatureChart = null;
     let humedadChart = null;
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const ctx = document.getElementById('humidityChart').getContext('2d');
 
+    function inicializarGraficaTemperatura(ultimosDatosV305,ultimosDatosV306,ultimosDatosV307){
+        ultimosDatosV305.reverse();
+        ultimosDatosV306.reverse();
+        ultimosDatosV307.reverse();
+        const datosV305 = ultimosDatosV305.map(d => ({ x: d.timestamp, y: d.humedad }));
+        const datosV306 = ultimosDatosV306.map(d => ({ x: d.timestamp, y: d.humedad }));
+        const datosV307 = ultimosDatosV307.map(d => ({ x: d.timestamp, y: d.humedad }));
+        const ctx = document.getElementById('temperatureChart').getContext('2d');
+
+        temperatureChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Etiquetas de tiempo
+                datasets: [
+                    {
+                        label: 'V305',
+                        data: [], // Datos del canal 1
+                        borderColor: '#4285F4', // Azul
+                        backgroundColor: 'rgba(66, 133, 244, 0.2)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'V306',
+                        data: [], // Datos del canal 2
+                        borderColor: '#34A853', // Verde
+                        backgroundColor: 'rgba(52, 168, 83, 0.2)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'V307',
+                        data: [], // Datos del canal 3
+                        borderColor: '#EA4335', // Rojo
+                        backgroundColor: 'rgba(234, 67, 53, 0.2)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tiempo'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Temperatura (°C)'
+                        },
+                        min: 18,
+                        max: 22
+                    }
+                }
+            }
+        });
+    }
+
+    function inicializarGraficaHumedad(ultimosDatosV305,ultimosDatosV306,ultimosDatosV307){
+        ultimosDatosV305.reverse();
+        ultimosDatosV306.reverse();
+        ultimosDatosV307.reverse();
+        const datosV305 = ultimosDatosV305.map(d => ({ x: d.timestamp, y: d.humedad }));
+        const datosV306 = ultimosDatosV306.map(d => ({ x: d.timestamp, y: d.humedad }));
+        const datosV307 = ultimosDatosV307.map(d => ({ x: d.timestamp, y: d.humedad }));
+        const ctx = document.getElementById('humidityChart').getContext('2d');
         humedadChart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -1146,73 +1295,7 @@
                 }
             }
         });
-    });
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const ctx = document.getElementById('temperatureChart').getContext('2d');
-
-        temperatureChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: [], // Etiquetas de tiempo
-                datasets: [
-                    {
-                        label: 'V305',
-                        data: [], // Datos del canal 1
-                        borderColor: '#4285F4', // Azul
-                        backgroundColor: 'rgba(66, 133, 244, 0.2)',
-                        borderWidth: 2,
-                        fill: false,
-                        tension: 0.3
-                    },
-                    {
-                        label: 'V306',
-                        data: [], // Datos del canal 2
-                        borderColor: '#34A853', // Verde
-                        backgroundColor: 'rgba(52, 168, 83, 0.2)',
-                        borderWidth: 2,
-                        fill: false,
-                        tension: 0.3
-                    },
-                    {
-                        label: 'V307',
-                        data: [], // Datos del canal 3
-                        borderColor: '#EA4335', // Rojo
-                        backgroundColor: 'rgba(234, 67, 53, 0.2)',
-                        borderWidth: 2,
-                        fill: false,
-                        tension: 0.3
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'bottom'
-                    }
-                },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Tiempo'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Temperatura (°C)'
-                        },
-                        min: 18,
-                        max: 22
-                    }
-                }
-            }
-        });
-    });
+    }
 
     function actualizarGrafico(message) {
         if (!temperatureChart || !temperatureChart.data || !temperatureChart.data.datasets) {
@@ -1303,12 +1386,15 @@
 
                 if (nuevoSalon === "V305"){
                     $("#temperatura-V305").text(nuevoDato.temperatura+" °C");
+                    $("#ultimaActualizacion-V305").text("Última actualización "+tiempoTranscurrido(nuevoDato.timestamp));
                     humedad305 = nuevoDato.humedad;
                 }else if (nuevoSalon === "V306"){
                     $("#temperatura-V306").text(nuevoDato.temperatura+" °C");
+                    $("#ultimaActualizacion-V306").text("Última actualización "+tiempoTranscurrido(nuevoDato.timestamp));
                     humedad306 = nuevoDato.humedad;
                 }else{
                     $("#temperatura-V307").text(nuevoDato.temperatura+" °C");
+                    $("#ultimaActualizacion-V307").text("Última actualización "+tiempoTranscurrido(nuevoDato.timestamp));
                     humedad307 = nuevoDato.humedad;
                 }
 

@@ -1,8 +1,10 @@
 package com.example.proyectotemasavanzados.Service;
 import com.example.proyectotemasavanzados.Entity.Dato;
+import com.example.proyectotemasavanzados.Entity.DatoDto;
 import com.example.proyectotemasavanzados.Entity.Salon;
 import com.example.proyectotemasavanzados.Repository.DatoRepository;
 import com.example.proyectotemasavanzados.Repository.SalonRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -65,7 +67,7 @@ public class Service {
     @GetMapping("/obtenerDatos")
     public ResponseEntity<HashMap<String,Object>> obtenerDatos(){
         HashMap<String,Object>datos=new HashMap<>();
-        datos.put("content",datoRepository.findAll());
+        datos.put("content", datoRepository.findAll(Sort.by(Sort.Direction.DESC, "timestamp"))); // Orden descendente
         datos.put("status","success");
         return ResponseEntity.ok(datos);
     }
@@ -73,7 +75,9 @@ public class Service {
     @GetMapping("/datosPorSalon/{salon}")
     public ResponseEntity<HashMap<String, Object>> obtenerDatosPorSalon(@PathVariable(value = "salon") String salon) {
         HashMap<String, Object> response = new HashMap<>();
-        response.put("content", datoRepository.listarDatosPorSalon(salon));
+        List<DatoDto>datos=datoRepository.listarDatosPorSalon(salon);
+        System.out.println("aiudaa"+datos.get(0).getTimestamp());
+        response.put("content", datos);
         response.put("status", "success");
         return ResponseEntity.ok(response);
     }

@@ -818,7 +818,7 @@
       }else {
         tendencia="Tendencia (aumentar "+(mTemperaturaArea*36000000).toFixed(2)+" C° cada hora)";
       }
-
+      console.log(datos)
       const options = {
         chart: {
           type: 'area',
@@ -895,7 +895,7 @@
           },
         }
       };
-
+      console.log(options)
       chartTemperaturaArea = new ApexCharts(document.querySelector("#graficoTemperaturaArea"), options);
       chartTemperaturaArea.render();
     }
@@ -1116,7 +1116,7 @@
       for(let i=0;i<datos.length;i++){
         agregarFila(datos[i]);
       }
-      const ultimoDato=datos[datos.length-1];
+      const ultimoDato=datos[0];
       recibirDato(ultimoDato);
       cargarGraficoTemperaturaArea();
       cargarGraficoHumedadArea();
