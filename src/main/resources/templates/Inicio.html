@@ -1252,50 +1252,89 @@
 
 
     // Función para procesar los datos
-    function procesarDatos(datos, rangoManana, rangoTarde) {
+    function procesarDatos(datos, rangoManana, rangoTarde,expresion) {
       const { a: inicioManana, b: finManana } = rangoManana;
       const { b: inicioTarde, c: finTarde } = rangoTarde;
 
       // Objeto para almacenar las temperaturas por día y rango
       const resultados = {};
 
+      if(expresion=="Temperatura"){
+        datos.forEach(({ temperatura, timestamp }) => {
+          const fechaCompleta = new Date(timestamp);
+          const dia = fechaCompleta.toISOString().split('T')[0]; // Obtiene solo el día (YYYY-MM-DD)
+          const hora = fechaCompleta.getHours() + fechaCompleta.getMinutes() / 60;
 
-      datos.forEach(({ temperatura, timestamp }) => {
-        const fechaCompleta = new Date(timestamp);
-        const dia = fechaCompleta.toISOString().split('T')[0]; // Obtiene solo el día (YYYY-MM-DD)
-        const hora = fechaCompleta.getHours() + fechaCompleta.getMinutes() / 60;
+          if (!resultados[dia]) {
+            resultados[dia] = {
+              manana: [],
+              tarde: [],
+              noche: [],
+            };
+          }
 
-        if (!resultados[dia]) {
-          resultados[dia] = {
-            manana: [],
-            tarde: [],
-            noche: [],
+          if (hora >= inicioManana && hora < finManana) {
+            resultados[dia].manana.push(temperatura);
+          } else if (hora >= inicioTarde && hora < finTarde) {
+            resultados[dia].tarde.push(temperatura);
+          } else {
+            resultados[dia].noche.push(temperatura);
+          }
+        });
+
+        // Calcula los promedios por día y rango
+        const dias = Object.keys(resultados);
+        const promedios = dias.map((dia) => {
+          const { manana, tarde, noche } = resultados[dia];
+
+          return {
+            dia,
+            manana: promedio(manana),
+            tarde: promedio(tarde),
+            noche: promedio(noche),
           };
-        }
+        });
 
-        if (hora >= inicioManana && hora < finManana) {
-          resultados[dia].manana.push(temperatura);
-        } else if (hora >= inicioTarde && hora < finTarde) {
-          resultados[dia].tarde.push(temperatura);
-        } else {
-          resultados[dia].noche.push(temperatura);
-        }
-      });
+        return promedios;
+      }else if(expresion=="Humedad"){
+        datos.forEach(({ humedad, timestamp }) => {
+          const fechaCompleta = new Date(timestamp);
+          const dia = fechaCompleta.toISOString().split('T')[0]; // Obtiene solo el día (YYYY-MM-DD)
+          const hora = fechaCompleta.getHours() + fechaCompleta.getMinutes() / 60;
 
-      // Calcula los promedios por día y rango
-      const dias = Object.keys(resultados);
-      const promedios = dias.map((dia) => {
-        const { manana, tarde, noche } = resultados[dia];
+          if (!resultados[dia]) {
+            resultados[dia] = {
+              manana: [],
+              tarde: [],
+              noche: [],
+            };
+          }
 
-        return {
-          dia,
-          manana: promedio(manana),
-          tarde: promedio(tarde),
-          noche: promedio(noche),
-        };
-      });
+          if (hora >= inicioManana && hora < finManana) {
+            resultados[dia].manana.push(humedad);
+          } else if (hora >= inicioTarde && hora < finTarde) {
+            resultados[dia].tarde.push(humedad);
+          } else {
+            resultados[dia].noche.push(humedad);
+          }
+        });
 
-      return promedios;
+        // Calcula los promedios por día y rango
+        const dias = Object.keys(resultados);
+        const promedios = dias.map((dia) => {
+          const { manana, tarde, noche } = resultados[dia];
+
+          return {
+            dia,
+            manana: promedio(manana),
+            tarde: promedio(tarde),
+            noche: promedio(noche),
+          };
+        });
+
+        return promedios;
+      }
+
     }
 
     // Función para calcular el promedio de un arreglo
@@ -1315,7 +1354,7 @@
         const rangoTarde = { b: b, c: c }; // 12:00 a 18:00
 
         const datosFiltrados = obtenerDatosFiltradosBarra("Temperatura").slice().reverse();
-        const promedios = procesarDatos(datosFiltrados, rangoManana, rangoTarde);
+        const promedios = procesarDatos(datosFiltrados, rangoManana, rangoTarde,"Temperatura");
 
         const categorias = promedios.length ? promedios.map((p) => p.dia) : ["Sin datos"];
         const dataManana = promedios.length ? promedios.map((p) => p.manana || 0) : [0];
@@ -1406,8 +1445,7 @@
         console.log(rangoManana,rangoTarde)
 
         const datosFiltrados = obtenerDatosFiltradosBarra("Humedad").slice().reverse();
-        datosFiltrados.reverse();
-        const promedios = procesarDatos(datosFiltrados, rangoManana, rangoTarde);
+        const promedios = procesarDatos(datosFiltrados, rangoManana, rangoTarde,"Humedad");
         const categorias = promedios.length ? promedios.map((p) => p.dia) : ["Sin datos"];
         const dataManana = promedios.length ? promedios.map((p) => p.manana || 0) : [0];
         const dataTarde = promedios.length ? promedios.map((p) => p.tarde || 0) : [0];
